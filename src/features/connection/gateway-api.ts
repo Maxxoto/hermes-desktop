@@ -76,6 +76,23 @@ export class GatewayClientError extends Error {
 }
 
 // ---------------------------------------------------------------------------
+// 401 detection — global callback invoked whenever any request returns 401
+// ---------------------------------------------------------------------------
+
+/** Callback type for 401 events. */
+export type OnUnauthorizedCallback = () => void;
+
+let onUnauthorized: OnUnauthorizedCallback | null = null;
+
+/**
+ * Register a global callback that fires when any GatewayClient request
+ * receives a 401 response. Used by the ReAuthBanner to show a prompt.
+ */
+export function setOnUnauthorized(cb: OnUnauthorizedCallback | null): void {
+  onUnauthorized = cb;
+}
+
+// ---------------------------------------------------------------------------
 // Client
 // ---------------------------------------------------------------------------
 export class GatewayClient {
@@ -111,6 +128,10 @@ export class GatewayClient {
 
     if (!res.ok) {
       const text = await res.text().catch(() => "unknown error");
+      // Fire global callback on 401 so the UI can show a re-auth banner
+      if (res.status === 401) {
+        onUnauthorized?.();
+      }
       throw new GatewayClientError(res.status, text);
     }
 
@@ -189,6 +210,9 @@ export class GatewayClient {
 
     if (!res.ok) {
       const text = await res.text().catch(() => "unknown error");
+      if (res.status === 401) {
+        onUnauthorized?.();
+      }
       throw new GatewayClientError(res.status, text);
     }
   }
@@ -218,6 +242,9 @@ export class GatewayClient {
 
       if (!res.ok) {
         const text = await res.text().catch(() => "unknown error");
+        if (res.status === 401) {
+          onUnauthorized?.();
+        }
         throw new GatewayClientError(res.status, text);
       }
 

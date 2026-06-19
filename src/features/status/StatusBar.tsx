@@ -4,7 +4,7 @@ const isConnected = (status: string) =>
   status.toLowerCase() === "ok" || status.toLowerCase() === "healthy";
 
 export default function StatusBar() {
-  const { data, isLoading, isError } = useGatewayHealth();
+  const { data, isLoading, isError, reconnectIn } = useGatewayHealth();
 
   const connected =
     !isLoading && !isError && data !== undefined && isConnected(data.status);
@@ -26,7 +26,13 @@ export default function StatusBar() {
         ) : (
           <span className="flex items-center gap-1.5">
             <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.6)]" />
-            <span className="text-red-400">Connection lost — retrying…</span>
+            {reconnectIn !== null ? (
+              <span className="text-red-400">
+                Connection lost — reconnecting in {reconnectIn}s.
+              </span>
+            ) : (
+              <span className="text-red-400">Connection lost — retrying…</span>
+            )}
           </span>
         )}
       </div>

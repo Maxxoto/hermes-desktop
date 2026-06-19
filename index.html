@@ -1,10 +1,23 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hermes Desktop</title>
+    <!-- Apply theme before React renders to avoid flash of unstyled content -->
+    <script>
+      (function () {
+        var t = localStorage.getItem("hermes-desktop-theme");
+        var html = document.documentElement;
+        if (t === "light") {
+          html.classList.remove("dark");
+          html.classList.add("light");
+        } else {
+          html.classList.add("dark");
+        }
+      })();
+    </script>
   </head>
 
   <body>

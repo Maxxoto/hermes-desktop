@@ -1,5 +1,20 @@
 @import "tailwindcss";
 
+/* Enable class-based dark mode (Tailwind v4) — `dark:` variants apply
+   when <html> has the `dark` class. Default theme is dark. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Ensure dark class is present by default on first paint */
+:root {
+  color-scheme: dark;
+}
+:root:not(.light) {
+  color-scheme: dark;
+}
+:root.light {
+  color-scheme: light;
+}
+
 /* Subtle scrollbar styling for dark theme */
 ::-webkit-scrollbar {
   width: 6px;

@@ -1,5 +1,7 @@
+import { useState, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { Copy, Check } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { type Message } from "./use-chat-store";
 import { ToolProgress } from "./ToolProgress";
@@ -11,11 +13,22 @@ interface MessageBubbleProps {
 
 export function MessageBubble({ message }: MessageBubbleProps) {
   const isUser = message.role === "user";
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(message.content);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard API might not be available in all contexts
+    }
+  }, [message.content]);
 
   return (
     <div
       className={cn(
-        "flex w-full mb-4",
+        "group flex w-full mb-4",
         isUser ? "justify-end" : "justify-start"
       )}
     >
@@ -38,6 +51,30 @@ export function MessageBubble({ message }: MessageBubbleProps) {
         )}
         {!isUser && message.toolCalls && message.toolCalls.length > 0 && (
           <ToolProgress toolCalls={message.toolCalls} />
+        )}
+      </div>
+
+      {/* Copy button — appears on hover */}
+      <div
+        className={cn(
+          "flex items-center self-center opacity-0 group-hover:opacity-100 transition-opacity",
+          isUser ? "order-first mr-1" : "ml-1"
+        )}
+      >
+        <button
+          onClick={handleCopy}
+          title={copied ? "Copied!" : "Copy message"}
+          className={cn(
+            "p-1.5 rounded-lg transition-colors cursor-pointer",
+            copied
+              ? "text-green-400 hover:text-green-300"
+              : "text-gray-500 hover:text-gray-300 hover:bg-gray-800"
+          )}
+        >
+          {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+        </button>
+        {copied && (
+          <span className="ml-0.5 text-xs text-green-400 font-medium">Copied!</span>
         )}
       </div>
     </div>

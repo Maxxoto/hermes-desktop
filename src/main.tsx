@@ -6,7 +6,16 @@ import ConnectionConfigPage from "./features/connection/ConnectionConfigPage";
 import ChatPage from "./features/chat/ChatPage";
 import StatusBar from "./features/status/StatusBar";
 import { useInitializeConnection } from "./features/connection/use-gateway-connection";
+import { setOnUnauthorized } from "./features/connection/gateway-api";
+import { useAuthStore } from "./features/connection/auth-store";
+import ReAuthBanner from "./features/connection/ReAuthBanner";
+import App from "./App";
 import "./index.css";
+
+// ---------------------------------------------------------------------------
+// Wire 401 detection — GatewayClient calls this when any request returns 401
+// ---------------------------------------------------------------------------
+setOnUnauthorized(() => useAuthStore.getState().setNeedsReauth(true));
 
 // ---------------------------------------------------------------------------
 // Query client
@@ -22,12 +31,26 @@ const queryClient = new QueryClient({
 });
 
 // ---------------------------------------------------------------------------
+// RootLayout — wraps ALL routes, renders global hooks + outlet
+// ---------------------------------------------------------------------------
+
+function RootLayout() {
+  return (
+    <>
+      <App />
+      <Outlet />
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Layout — wraps chat routes with StatusBar at the bottom
 // ---------------------------------------------------------------------------
 
 function Layout() {
   return (
     <div className="flex flex-col h-screen bg-gray-950">
+      <ReAuthBanner />
       <Outlet />
       <StatusBar />
     </div>
@@ -40,20 +63,26 @@ function Layout() {
 
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <ConnectionConfigPage />,
-  },
-  {
-    path: "/connection",
-    element: <ConnectionConfigPage />,
-  },
-  {
-    // Layout route — wraps children with StatusBar
-    element: <Layout />,
+    // Root layout — renders App (auto-updater + deep-link hooks) for all children
+    element: <RootLayout />,
     children: [
       {
-        path: "/chat",
-        element: <ChatPage />,
+        path: "/",
+        element: <ConnectionConfigPage />,
+      },
+      {
+        path: "/connection",
+        element: <ConnectionConfigPage />,
+      },
+      {
+        // Layout route — wraps children with StatusBar
+        element: <Layout />,
+        children: [
+          {
+            path: "/chat",
+            element: <ChatPage />,
+          },
+        ],
       },
     ],
   },

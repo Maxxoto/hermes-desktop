@@ -1,17 +1,24 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MessageSquare, GitFork, Menu, X, Square, LogOut } from "lucide-react";
+import { MessageSquare, GitFork, Menu, X, Square, LogOut, Sun, Moon } from "lucide-react";
 import { useChatStore, type Message } from "./use-chat-store";
 import { ChatInput } from "./ChatInput";
 import { MessageBubble } from "./MessageBubble";
 import SessionList from "../sessions/SessionList";
 import ForkDialog from "./ForkDialog";
 import CompressButton from "./CompressButton";
+import { ExportButton } from "./ExportButton";
+import { useAutoTitle } from "../sessions/use-sessions";
 import {
   getGatewayClient,
   type SessionMessage,
 } from "../connection/gateway-api";
 import { useConnectionStore } from "../connection/connection-store";
+import { useWindowTitle } from "../../hooks/use-window-title";
+import { useKeyboardShortcuts } from "../../hooks/use-keyboard-shortcuts";
+import { useTheme } from "../../hooks/use-theme";
+import { useDeleteSession } from "../sessions/use-sessions";
+import { useAgentNotifications } from "../../hooks/use-agent-notifications";
 
 export default function ChatPage() {
   const navigate = useNavigate();
@@ -30,10 +37,40 @@ export default function ChatPage() {
     clear,
   } = useChatStore();
 
+  const autoTitle = useAutoTitle();
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const [showForkDialog, setShowForkDialog] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
+
+  // Window title — derive from first user message or session ID
+  const sessionTitle = sessionId
+    ? messages.find((m) => m.role === "user")?.content.slice(0, 60) || `Session ${sessionId.slice(0, 8)}`
+    : "New Chat";
+  useWindowTitle(sessionTitle);
+
+  // Session delete mutation (for Cmd+Backspace shortcut)
+  const deleteSession = useDeleteSession();
+
+  // Notifications — fires when agent completes a response while window is unfocused
+  const { notifyOnCompletion } = useAgentNotifications();
+
+  // Theme toggle
+  const { theme, toggleTheme } = useTheme();
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts({
+    onNewSession: useCallback(() => {
+      clear();
+    }, [clear]),
+    onDeleteSession: useCallback(() => {
+      if (sessionId) {
+        deleteSession.mutate(sessionId);
+        clear();
+      }
+    }, [sessionId, deleteSession, clear]),
+  });
 
   // auto-scroll
   useEffect(() => {
@@ -54,11 +91,13 @@ export default function ChatPage() {
 
       // ensure we have a session
       let currentSessionId = sessionId;
+      let isNewSession = false;
       if (!currentSessionId) {
         try {
           const session = await getGatewayClient().createSession();
           currentSessionId = session.id;
           setSession(currentSessionId);
+          isNewSession = true;
         } catch (err) {
           addMessage({
             id: `err_${Date.now()}`,
@@ -108,6 +147,18 @@ export default function ChatPage() {
                   );
                 }
                 setStreaming(false);
+                // Notify if window is not focused
+                if (!document.hasFocus()) {
+                  const summary = event.content
+                    ? event.content.slice(0, 120) + (event.content.length > 120 ? "…" : "")
+                    : "Response complete";
+                  notifyOnCompletion(summary);
+                }
+                // Auto-title: fire once after the first exchange in a new session
+                if (isNewSession) {
+                  autoTitle.mutate({ id: currentSessionId!, message: text });
+                  isNewSession = false;
+                }
                 break;
               case "run.error":
                 appendToLastAssistant(`\n\n[Error: ${event.error}]`);
@@ -135,6 +186,8 @@ export default function ChatPage() {
       finalizeTool,
       setSession,
       setStreaming,
+      autoTitle,
+      notifyOnCompletion,
     ]
   );
 
@@ -253,9 +306,25 @@ export default function ChatPage() {
             >
               <GitFork className="h-4 w-4" />
             </button>
+            <ExportButton
+              messages={messages}
+              sessionTitle={sessionTitle}
+              disabled={!sessionId}
+            />
             {sessionId && (
               <CompressButton messageCount={messages.length} />
             )}
+            <button
+              onClick={toggleTheme}
+              title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              className="p-1.5 rounded-lg text-gray-500 hover:text-gray-200 hover:bg-gray-800 transition-colors cursor-pointer"
+            >
+              {theme === "dark" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+            </button>
             <button
               onClick={handleLogout}
               title="Disconnect and go back"

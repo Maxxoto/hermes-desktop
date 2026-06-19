@@ -108,6 +108,8 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_deep_link::init())
         .setup(|app| {
             // Build tray menu
             let show = MenuItem::with_id(app, "show", "Show Hermes", true, None::<&str>)?;
@@ -123,6 +125,7 @@ pub fn run() {
                     .on_menu_event(|app, event| match event.id.as_ref() {
                         "show" => {
                             if let Some(window) = app.get_webview_window("main") {
+                                let _ = window.unminimize();
                                 let _ = window.show();
                                 let _ = window.set_focus();
                             }

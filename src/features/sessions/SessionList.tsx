@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { MessageSquarePlus, Search, MessageSquare } from 'lucide-react';
 import { useSessions } from './use-sessions';
 import SessionItem from './SessionItem';
@@ -88,6 +88,17 @@ export default function SessionList({
 }: SessionListProps) {
   const { data: sessions, isLoading } = useSessions();
   const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Listen for Cmd/Ctrl+K to focus search
+  useEffect(() => {
+    const handleFocusSearch = () => {
+      searchInputRef.current?.focus();
+      searchInputRef.current?.select();
+    };
+    window.addEventListener('hermes:focus-search', handleFocusSearch);
+    return () => window.removeEventListener('hermes:focus-search', handleFocusSearch);
+  }, []);
 
   const filteredSessions = useMemo(() => {
     if (!sessions) return [];
@@ -127,6 +138,7 @@ export default function SessionList({
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
           <input
+            ref={searchInputRef}
             type="text"
             placeholder="Search conversations..."
             value={searchQuery}

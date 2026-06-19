@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { invoke } from "@tauri-apps/api/core";
 import { useConnectionStore } from "./connection-store";
 import { useTestConnection } from "./use-gateway-connection";
+import { useWindowTitle } from "../../hooks/use-window-title";
 
 // ---------------------------------------------------------------------------
 // ConnectionConfigPage — /connection
@@ -12,6 +13,8 @@ export default function ConnectionConfigPage() {
   const navigate = useNavigate();
   const { gatewayUrl, apiKey, isConfigured, setCredentials } =
     useConnectionStore();
+
+  useWindowTitle("Settings");
 
   const [url, setUrl] = useState(gatewayUrl);
   const [key, setKey] = useState(apiKey);

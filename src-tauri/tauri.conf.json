@@ -20,14 +20,15 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' http://* https://* ws://*; img-src 'self' data: https:; font-src 'self' data:"
     }
   },
   "bundle": {
     "active": true,
     "targets": ["dmg", "app"],
     "macOS": {
-      "minimumSystemVersion": "13.0"
+      "minimumSystemVersion": "11.0",
+      "signingIdentity": "Developer ID Application: Ahmat Dani (TEAM_ID_PLACEHOLDER)"
     },
     "icon": [
       "icons/32x32.png",
@@ -36,5 +37,18 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "updater": {
+      "active": true,
+      "endpoints": [
+        "https://releases.example.com/hermes-desktop/{{target}}/{{arch}}/{{current_version}}"
+      ],
+      "pubKey": "UPDATER_PUBKEY_PLACEHOLDER_REPLACE_WITH_REAL_KEY",
+      "dialog": true
+    },
+    "deep-link": {
+      "desktopSchemes": ["hermes"]
+    }
   }
 }
