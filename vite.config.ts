@@ -4,6 +4,8 @@ import tailwindcss from "@tailwindcss/vite";
 
 // @ts-expect-error process is a nodejs global
 const host = process.env.TAURI_DEV_HOST;
+// Proxy target: defaults to localhost (homeserver), override for remote dev
+const gatewayTarget = process.env.GATEWAY_TARGET || "http://127.0.0.1:8642";
 
 // https://vite.dev/config/
 export default defineConfig(async () => ({
@@ -32,15 +34,15 @@ export default defineConfig(async () => ({
     // Proxy API requests to the Hermes Gateway on port 8642
     proxy: {
       "/health": {
-        target: "http://127.0.0.1:8642",
+        target: gatewayTarget,
         changeOrigin: true,
       },
       "/api": {
-        target: "http://127.0.0.1:8642",
+        target: gatewayTarget,
         changeOrigin: true,
       },
       "/v1": {
-        target: "http://127.0.0.1:8642",
+        target: gatewayTarget,
         changeOrigin: true,
       },
     },
