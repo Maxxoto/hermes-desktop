@@ -81,6 +81,7 @@ export class GatewayClientError extends Error {
 export class GatewayClient {
   private baseUrl: string;
   private apiKey: string;
+  private abortController: AbortController | null = null;
 
   constructor(baseUrl: string, apiKey: string) {
     this.baseUrl = baseUrl.replace(/\/+$/, "");
@@ -205,51 +206,70 @@ export class GatewayClient {
   ): Promise<void> {
     const url = `${this.baseUrl}/api/sessions/${encodeURIComponent(sessionId)}/chat/stream`;
 
-    const res = await fetch(url, {
-      method: "POST",
-      headers: this.headers({ Accept: "text/event-stream" }),
-      body: JSON.stringify({ message }),
-    });
+    this.abortController = new AbortController();
 
-    if (!res.ok) {
-      const text = await res.text().catch(() => "unknown error");
-      throw new GatewayClientError(res.status, text);
-    }
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: this.headers({ Accept: "text/event-stream" }),
+        body: JSON.stringify({ message }),
+        signal: this.abortController.signal,
+      });
 
-    const reader = res.body?.getReader();
-    if (!reader) {
-      throw new Error("Response body is not readable");
-    }
+      if (!res.ok) {
+        const text = await res.text().catch(() => "unknown error");
+        throw new GatewayClientError(res.status, text);
+      }
 
-    const decoder = new TextDecoder();
-    let buffer = "";
+      const reader = res.body?.getReader();
+      if (!reader) {
+        throw new Error("Response body is not readable");
+      }
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+      const decoder = new TextDecoder();
+      let buffer = "";
 
-      buffer += decoder.decode(value, { stream: true });
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
 
-      // Process complete SSE messages (separated by double newline)
-      const parts = buffer.split("\n\n");
-      // Keep the last (potentially incomplete) chunk in the buffer
-      buffer = parts.pop() ?? "";
+        buffer += decoder.decode(value, { stream: true });
 
-      for (const part of parts) {
-        const event = this.parseSSEEvent(part);
+        // Process complete SSE messages (separated by double newline)
+        const parts = buffer.split("\n\n");
+        // Keep the last (potentially incomplete) chunk in the buffer
+        buffer = parts.pop() ?? "";
+
+        for (const part of parts) {
+          const event = this.parseSSEEvent(part);
+          if (event) {
+            onEvent(event);
+          }
+        }
+      }
+
+      // Process any remaining data in the buffer
+      if (buffer.trim()) {
+        const event = this.parseSSEEvent(buffer.trim());
         if (event) {
           onEvent(event);
         }
       }
-    }
-
-    // Process any remaining data in the buffer
-    if (buffer.trim()) {
-      const event = this.parseSSEEvent(buffer.trim());
-      if (event) {
-        onEvent(event);
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") {
+        // User-initiated stop — silently return
+        return;
       }
+      throw err;
+    } finally {
+      this.abortController = null;
     }
+  }
+
+  /** Abort an in-progress chatStream call. */
+  stopGeneration(): void {
+    this.abortController?.abort();
+    this.abortController = null;
   }
 
   /** POST /api/sessions/{id}/fork — returns { object, session } */

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from "react";
-import { MessageSquare, GitFork, Menu, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { MessageSquare, GitFork, Menu, X, Square, LogOut } from "lucide-react";
 import { useChatStore, type Message } from "./use-chat-store";
 import { ChatInput } from "./ChatInput";
 import { MessageBubble } from "./MessageBubble";
@@ -10,8 +11,11 @@ import {
   getGatewayClient,
   type SessionMessage,
 } from "../connection/gateway-api";
+import { useConnectionStore } from "../connection/connection-store";
 
 export default function ChatPage() {
+  const navigate = useNavigate();
+
   const {
     sessionId,
     messages,
@@ -177,6 +181,22 @@ export default function ChatPage() {
     [setSession, loadFromSession],
   );
 
+  const handleStopGeneration = useCallback(() => {
+    getGatewayClient().stopGeneration();
+    setStreaming(false);
+  }, [setStreaming]);
+
+  const handleLogout = useCallback(async () => {
+    useConnectionStore.getState().clear();
+    try {
+      const { invoke } = await import("@tauri-apps/api/core");
+      await invoke("store_credentials", { url: "", apiKey: "" });
+    } catch {
+      // invoke might fail in browser mode — ignore
+    }
+    navigate("/");
+  }, [navigate]);
+
   return (
     <div className="flex flex-1 min-h-0 bg-gray-950 text-gray-100 overflow-hidden">
       {/* Sidebar — hidden on mobile, overlay when toggled */}
@@ -236,6 +256,13 @@ export default function ChatPage() {
             {sessionId && (
               <CompressButton messageCount={messages.length} />
             )}
+            <button
+              onClick={handleLogout}
+              title="Disconnect and go back"
+              className="p-1.5 rounded-lg text-gray-500 hover:text-gray-200 hover:bg-gray-800 transition-colors cursor-pointer"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
           </div>
         </header>
 
@@ -262,7 +289,22 @@ export default function ChatPage() {
         </div>
 
         {/* Input */}
-        <ChatInput onSend={handleSend} disabled={isStreaming} />
+        <div className="flex items-end gap-2">
+          {isStreaming && (
+            <div className="flex-shrink-0 pb-3 pl-4">
+              <button
+                onClick={handleStopGeneration}
+                title="Stop generation"
+                className="p-2.5 rounded-xl bg-gray-700 hover:bg-red-600 text-gray-300 hover:text-white transition-colors cursor-pointer"
+              >
+                <Square className="h-5 w-5" />
+              </button>
+            </div>
+          )}
+          <div className="flex-1">
+            <ChatInput onSend={handleSend} disabled={isStreaming} />
+          </div>
+        </div>
       </div>
     </div>
   );

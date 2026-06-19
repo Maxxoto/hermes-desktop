@@ -16,7 +16,4 @@
   background: #4b5563;
 }
 
-/* Prevent text selection on drag */
-html {
-  user-select: none;
-}
+/* Allow text selection in chat, prevent on UI chrome */

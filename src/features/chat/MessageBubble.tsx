@@ -1,6 +1,9 @@
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { cn } from "../../lib/utils";
 import { type Message } from "./use-chat-store";
 import { ToolProgress } from "./ToolProgress";
+import "../chat/markdown-styles.css";
 
 interface MessageBubbleProps {
   message: Message;
@@ -18,13 +21,21 @@ export function MessageBubble({ message }: MessageBubbleProps) {
     >
       <div
         className={cn(
-          "max-w-[80%] rounded-2xl px-4 py-2.5 break-words whitespace-pre-wrap",
+          "max-w-[80%] rounded-2xl px-4 py-2.5 break-words",
           isUser
-            ? "bg-blue-600 text-white rounded-br-md"
+            ? "bg-blue-600 text-white rounded-br-md whitespace-pre-wrap"
             : "bg-gray-800 text-gray-100 rounded-bl-md border border-gray-700/50"
         )}
       >
-        <p className="text-sm leading-relaxed">{message.content}</p>
+        {isUser ? (
+          <p className="text-sm leading-relaxed">{message.content}</p>
+        ) : (
+          <div className="markdown-prose text-sm leading-relaxed">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {message.content}
+            </ReactMarkdown>
+          </div>
+        )}
         {!isUser && message.toolCalls && message.toolCalls.length > 0 && (
           <ToolProgress toolCalls={message.toolCalls} />
         )}

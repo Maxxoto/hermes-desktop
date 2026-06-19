@@ -1,19 +1,10 @@
-import { useState, useCallback } from "react";
-import { Minimize2, Check } from "lucide-react";
+import { Info } from "lucide-react";
+
 interface CompressButtonProps {
   messageCount: number;
 }
 
 export default function CompressButton({ messageCount }: CompressButtonProps) {
-  const [compressedAt, setCompressedAt] = useState<Date | null>(null);
-  const [showToast, setShowToast] = useState(false);
-
-  const handleCompress = useCallback(() => {
-    setCompressedAt(new Date());
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 2000);
-  }, []);
-
   return (
     <div className="relative flex items-center">
       {/* Message counter */}
@@ -24,34 +15,21 @@ export default function CompressButton({ messageCount }: CompressButtonProps) {
         </span>
       </span>
 
-      {/* Compress button */}
-      <button
-        onClick={handleCompress}
-        title="Compress context"
-        className="p-1.5 rounded-lg text-gray-500 hover:text-gray-200 hover:bg-gray-800 transition-colors cursor-pointer"
-      >
-        <Minimize2 className="h-4 w-4" />
-      </button>
-
-      {/* Last compressed indicator */}
-      {compressedAt && (
-        <span
-          className="ml-1.5 text-[10px] text-gray-600 flex items-center gap-0.5"
-          title={`Last compressed: ${compressedAt.toLocaleTimeString()}`}
+      {/* Info icon with tooltip */}
+      <div className="group relative">
+        <button
+          title="Context is compressed automatically at 50%"
+          className="p-1.5 rounded-lg text-gray-500 hover:text-gray-200 hover:bg-gray-800 transition-colors cursor-pointer"
+          type="button"
         >
-          <Check className="h-3 w-3" />
-        </span>
-      )}
-
-      {/* Toast notification */}
-      {showToast && (
-        <div className="absolute top-full right-0 mt-2 z-40 pointer-events-none animate-fade-in">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs shadow-lg whitespace-nowrap">
-            <Check className="h-3 w-3" />
-            Context compressed
+          <Info className="h-4 w-4" />
+        </button>
+        <div className="absolute top-full right-0 mt-2 z-40 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="px-3 py-1.5 rounded-lg bg-gray-800 text-gray-300 text-xs shadow-lg whitespace-nowrap border border-gray-700">
+            Context is compressed automatically at 50%
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
