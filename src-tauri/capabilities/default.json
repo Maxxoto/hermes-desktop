@@ -7,7 +7,6 @@
     "core:default",
     "opener:default",
     "store:default",
-    "notification:default",
-    "shell:default"
+    "notification:default"
   ]
 }
