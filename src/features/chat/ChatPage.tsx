@@ -38,7 +38,7 @@ export default function ChatPage() {
 
   const handleSend = useCallback(
     async (text: string) => {
-      const ts = new Date().toISOString();
+      const ts = Date.now() / 1000;
 
       // add user message
       addMessage({
@@ -60,7 +60,7 @@ export default function ChatPage() {
             id: `err_${Date.now()}`,
             role: "assistant",
             content: `Failed to create session: ${err instanceof Error ? err.message : String(err)}`,
-            timestamp: new Date().toISOString(),
+            timestamp: Date.now() / 1000,
           });
           return;
         }
@@ -72,7 +72,7 @@ export default function ChatPage() {
         id: assistantId,
         role: "assistant",
         content: "",
-        timestamp: new Date().toISOString(),
+        timestamp: Date.now() / 1000,
       });
 
       setStreaming(true);
@@ -144,7 +144,7 @@ export default function ChatPage() {
           id: `loaded_${i}`,
           role: m.role === "system" ? "assistant" : m.role,
           content: m.content,
-          timestamp: m.created_at,
+          timestamp: m.timestamp,
         }));
         loadFromSession(loaded);
       } catch {
@@ -167,7 +167,7 @@ export default function ChatPage() {
           id: `loaded_${i}`,
           role: m.role === "system" ? "assistant" : m.role,
           content: m.content,
-          timestamp: m.created_at,
+          timestamp: m.timestamp,
         }));
         loadFromSession(loaded);
       } catch {

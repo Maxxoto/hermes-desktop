@@ -28,9 +28,9 @@ function getSourceIcon(source: string) {
   return Icon;
 }
 
-function formatRelativeTime(dateStr: string): string {
+function formatRelativeTime(epochSec: number): string {
   const now = Date.now();
-  const then = new Date(dateStr).getTime();
+  const then = epochSec * 1000;
   const diffMs = now - then;
   const diffMin = Math.floor(diffMs / 60_000);
 
@@ -43,7 +43,7 @@ function formatRelativeTime(dateStr: string): string {
   const diffDay = Math.floor(diffHr / 24);
   if (diffDay < 7) return `${diffDay}d`;
 
-  return new Date(dateStr).toLocaleDateString(undefined, {
+  return new Date(epochSec * 1000).toLocaleDateString(undefined, {
     month: 'short',
     day: 'numeric',
   });
@@ -78,7 +78,7 @@ export default function SessionItem({ session, isActive, onClick }: SessionItemP
             {getDisplayTitle(session)}
           </span>
           <span className="text-xs text-gray-500 shrink-0">
-            {formatRelativeTime(session.updated_at)}
+            {formatRelativeTime(session.last_active)}
           </span>
         </div>
 

@@ -17,27 +17,36 @@ export interface Session {
   source: string;
   model: string;
   message_count: number;
-  created_at: string;
-  updated_at: string;
+  started_at: number;
+  last_active: number;
+  user_id?: string | null;
+  preview?: string | null;
 }
 
 export interface SessionMessage {
   id: string;
+  session_id?: string;
   role: "user" | "assistant" | "system";
   content: string;
-  created_at: string;
+  timestamp: number;
 }
 
-export interface SessionsResponse {
-  items: Session[];
-  total: number;
-  page: number;
-  per_page: number;
+// --- API response wrappers --------------------------------------------------
+
+interface SessionWrapper {
+  object: string;
+  session: Session;
 }
 
-export interface MessagesResponse {
-  items: SessionMessage[];
-  total: number;
+interface SessionsListResponse {
+  object: string;
+  data: Session[];
+}
+
+interface MessagesListResponse {
+  object: string;
+  session_id: string;
+  data: SessionMessage[];
 }
 
 export interface HealthResponse {
@@ -83,7 +92,7 @@ export class GatewayClient {
   private headers(extra: Record<string, string> = {}): Record<string, string> {
     return {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${this.apiKey}`,
+      Authorization: `Bearer ${this.apiKey}`,
       ...extra,
     };
   }
@@ -119,28 +128,30 @@ export class GatewayClient {
     return this.request<HealthDetailedResponse>("GET", "/health/detailed");
   }
 
-  /** POST /api/sessions */
+  /** POST /api/sessions — API requires {} body, returns { object, session } */
   async createSession(title?: string): Promise<Session> {
-    return this.request<Session>(
+    const res = await this.request<SessionWrapper>(
       "POST",
       "/api/sessions",
-      title !== undefined ? { title } : undefined,
+      { ...(title !== undefined && { title }) },
     );
+    return res.session;
   }
 
-  /** GET /api/sessions */
+  /** GET /api/sessions — returns { object, data: Session[] } */
   async listSessions(limit?: number, offset?: number): Promise<Session[]> {
     const params = new URLSearchParams();
     if (limit !== undefined) params.set("limit", String(limit));
     if (offset !== undefined) params.set("offset", String(offset));
     const qs = params.toString();
-    return this.request<Session[]>(
+    const res = await this.request<SessionsListResponse>(
       "GET",
       `/api/sessions${qs ? `?${qs}` : ""}`,
     );
+    return res.data ?? [];
   }
 
-  /** GET /api/sessions/{id}/messages */
+  /** GET /api/sessions/{id}/messages — returns { object, session_id, data } */
   async getSessionMessages(
     id: string,
     limit?: number,
@@ -148,22 +159,24 @@ export class GatewayClient {
     const params = new URLSearchParams();
     if (limit !== undefined) params.set("limit", String(limit));
     const qs = params.toString();
-    return this.request<SessionMessage[]>(
+    const res = await this.request<MessagesListResponse>(
       "GET",
       `/api/sessions/${encodeURIComponent(id)}/messages${qs ? `?${qs}` : ""}`,
     );
+    return res.data ?? [];
   }
 
-  /** PATCH /api/sessions/{id} */
+  /** PATCH /api/sessions/{id} — returns { object, session } */
   async patchSession(
     id: string,
     data: Partial<Pick<Session, "title">>,
   ): Promise<Session> {
-    return this.request<Session>(
+    const res = await this.request<SessionWrapper>(
       "PATCH",
       `/api/sessions/${encodeURIComponent(id)}`,
       data,
     );
+    return res.session;
   }
 
   /** DELETE /api/sessions/{id} */
@@ -239,26 +252,40 @@ export class GatewayClient {
     }
   }
 
-  /** POST /api/sessions/{id}/fork */
+  /** POST /api/sessions/{id}/fork — returns { object, session } */
   async forkSession(
     sessionId: string,
     messageIndex?: number,
   ): Promise<ForkResult> {
-    return this.request<ForkResult>(
+    const res = await this.request<SessionWrapper>(
       "POST",
       `/api/sessions/${encodeURIComponent(sessionId)}/fork`,
-      messageIndex !== undefined ? { message_index: messageIndex } : undefined,
+      { ...(messageIndex !== undefined && { message_index: messageIndex }) },
     );
+    return { id: res.session.id };
   }
 
   // ---- SSE parser --------------------------------------------------------
 
+  /**
+   * Parse a single SSE event block into a GatewayEvent.
+   *
+   * Hermes SSE format:
+   *   event: assistant.delta
+   *   data: {"delta": "Hello", "message_id": "...", ...}
+   *
+   * We read the `event:` line for the event type, then map the `data:` JSON
+   * into the typed GatewayEvent union.
+   */
   private parseSSEEvent(chunk: string): GatewayEvent | null {
     const lines = chunk.split("\n");
+    let eventType = "";
     const dataLines: string[] = [];
 
     for (const line of lines) {
-      if (line.startsWith("data: ")) {
+      if (line.startsWith("event: ")) {
+        eventType = line.slice(7).trim();
+      } else if (line.startsWith("data: ")) {
         dataLines.push(line.slice(6));
       } else if (line.startsWith("data:")) {
         dataLines.push(line.slice(5));
@@ -271,9 +298,57 @@ export class GatewayClient {
     if (!raw) return null;
 
     try {
-      return JSON.parse(raw) as GatewayEvent;
+      const data = JSON.parse(raw);
+      return this.mapSSEEvent(eventType, data);
     } catch {
       return null;
+    }
+  }
+
+  /** Map Hermes SSE event type + data into a typed GatewayEvent. */
+  private mapSSEEvent(eventType: string, data: Record<string, unknown>): GatewayEvent | null {
+    switch (eventType) {
+      case "assistant.delta":
+        return { type: "assistant.delta", delta: String(data.delta ?? "") };
+
+      case "assistant.completed": {
+        // Final assembled message — best source for run.completed content
+        const content = String(data.content ?? "");
+        return content ? { type: "run.completed", content } : null;
+      }
+
+      case "run.completed": {
+        // Fallback: extract from messages array if assistant.completed didn't fire
+        const messages = data.messages as Array<Record<string, unknown>> | undefined;
+        const content = messages?.[0]
+          ? String(messages[0].content ?? "")
+          : String(data.content ?? "");
+        return content ? { type: "run.completed", content } : null;
+      }
+
+      case "run.error":
+        return { type: "run.error", error: String(data.error ?? data.message ?? "Unknown error") };
+
+      case "tool.started": {
+        const toolName = String(data.tool_name ?? data.tool ?? "");
+        const args = data.args;
+        const argsStr = typeof args === "string" ? args : args ? JSON.stringify(args) : undefined;
+        return { type: "tool.started", tool: toolName, args: argsStr };
+      }
+
+      case "tool.completed":
+        return { type: "tool.completed", tool: String(data.tool_name ?? data.tool ?? "") };
+
+      // Ignored event types (transitional / informational / thinking)
+      case "run.started":
+      case "message.started":
+      case "message.delta":
+      case "message.completed":
+      case "tool.progress":
+      case "thinking.delta":
+      case "done":
+      default:
+        return null;
     }
   }
 }
@@ -284,10 +359,21 @@ import { useConnectionStore } from "./connection-store";
 // Factory — reads current credentials from store
 // ---------------------------------------------------------------------------
 
+/**
+ * Detect if we're running inside Tauri (native window) or a browser.
+ * In browser mode (Vite dev), API calls go through Vite proxy on port 1420.
+ * In Tauri mode, API calls go directly to the configured gateway URL.
+ */
+function isTauri(): boolean {
+  return typeof window !== "undefined" && "__TAURI__" in window;
+}
+
 export function getGatewayClient(): GatewayClient {
   const { gatewayUrl, apiKey } = useConnectionStore.getState();
   if (!gatewayUrl || !apiKey) {
     throw new Error("Gateway not configured. Set credentials first.");
   }
-  return new GatewayClient(gatewayUrl, apiKey);
+  // In browser mode, use relative URLs — Vite proxy forwards to the gateway
+  const baseUrl = isTauri() ? gatewayUrl : "";
+  return new GatewayClient(baseUrl, apiKey);
 }

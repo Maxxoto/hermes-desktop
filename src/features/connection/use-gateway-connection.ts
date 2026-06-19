@@ -3,6 +3,10 @@ import { invoke } from "@tauri-apps/api/core";
 import { GatewayClient, type HealthResponse } from "./gateway-api";
 import { useConnectionStore } from "./connection-store";
 
+function isTauri(): boolean {
+  return typeof window !== "undefined" && "__TAURI__" in window;
+}
+
 // ---------------------------------------------------------------------------
 // useInitializeConnection — hydrate store from Rust keychain on mount
 // ---------------------------------------------------------------------------
@@ -40,7 +44,9 @@ export function useTestConnection() {
       url: string;
       key: string;
     }): Promise<HealthResponse> => {
-      const client = new GatewayClient(url, key);
+      // In browser mode, use relative URLs — Vite proxy forwards to the gateway
+      const baseUrl = isTauri() ? url : "";
+      const client = new GatewayClient(baseUrl, key);
       return client.health();
     },
   });

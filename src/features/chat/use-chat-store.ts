@@ -11,7 +11,7 @@ export interface Message {
   role: "user" | "assistant";
   content: string;
   toolCalls?: ToolCall[];
-  timestamp: string;
+  timestamp: number;
 }
 
 interface ChatState {

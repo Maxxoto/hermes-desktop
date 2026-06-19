@@ -29,5 +29,20 @@ export default defineConfig(async () => ({
       // 3. tell Vite to ignore watching `src-tauri`
       ignored: ["**/src-tauri/**"],
     },
+    // Proxy API requests to the Hermes Gateway on port 8642
+    proxy: {
+      "/health": {
+        target: "http://127.0.0.1:8642",
+        changeOrigin: true,
+      },
+      "/api": {
+        target: "http://127.0.0.1:8642",
+        changeOrigin: true,
+      },
+      "/v1": {
+        target: "http://127.0.0.1:8642",
+        changeOrigin: true,
+      },
+    },
   },
 }));

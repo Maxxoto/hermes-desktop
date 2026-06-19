@@ -12,9 +12,9 @@ interface SessionListProps {
 
 type DateGroup = 'Today' | 'Yesterday' | 'Older';
 
-function getDateGroup(dateStr: string): DateGroup {
+function getDateGroup(epochSec: number): DateGroup {
   const now = new Date();
-  const date = new Date(dateStr);
+  const date = new Date(epochSec * 1000);
 
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const yesterdayStart = new Date(todayStart.getTime() - 86_400_000);
@@ -28,7 +28,7 @@ function groupSessions(sessions: Session[]): [DateGroup, Session[]][] {
   const groups = new Map<DateGroup, Session[]>();
 
   for (const session of sessions) {
-    const group = getDateGroup(session.updated_at);
+    const group = getDateGroup(session.last_active);
     const list = groups.get(group);
     if (list) {
       list.push(session);
@@ -40,7 +40,7 @@ function groupSessions(sessions: Session[]): [DateGroup, Session[]][] {
   // Sort sessions within each group by updated_at descending (most recent first)
   for (const [, sessions] of groups) {
     sessions.sort(
-      (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
+      (a, b) => b.last_active - a.last_active,
     );
   }
 
