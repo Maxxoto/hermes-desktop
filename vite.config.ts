@@ -1,50 +1,48 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
 // @ts-expect-error process is a nodejs global
 const host = process.env.TAURI_DEV_HOST;
-// Proxy target: defaults to localhost (homeserver), override for remote dev
-const gatewayTarget = process.env.GATEWAY_TARGET || "http://127.0.0.1:8642";
 
 // https://vite.dev/config/
-export default defineConfig(async () => ({
-  plugins: [tailwindcss(), react()],
+export default defineConfig(async ({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), "");
+  const gatewayTarget = env.GATEWAY_TARGET || "http://127.0.0.1:8642";
 
-  // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
-  //
-  // 1. prevent Vite from obscuring rust errors
-  clearScreen: false,
-  // 2. tauri expects a fixed port, fail if that port is not available
-  server: {
-    port: 1420,
-    strictPort: true,
-    host: host || false,
-    hmr: host
-      ? {
-          protocol: "ws",
-          host,
-          port: 1421,
-        }
-      : undefined,
-    watch: {
-      // 3. tell Vite to ignore watching `src-tauri`
-      ignored: ["**/src-tauri/**"],
+  return {
+    plugins: [tailwindcss(), react()],
+
+    clearScreen: false,
+    server: {
+      port: 1420,
+      strictPort: true,
+      host: host || false,
+      hmr: host
+        ? {
+            protocol: "ws",
+            host,
+            port: 1421,
+          }
+        : undefined,
+      watch: {
+        ignored: ["**/src-tauri/**"],
+      },
+      // Proxy API requests to the Hermes Gateway
+      proxy: {
+        "/health": {
+          target: gatewayTarget,
+          changeOrigin: true,
+        },
+        "/api": {
+          target: gatewayTarget,
+          changeOrigin: true,
+        },
+        "/v1": {
+          target: gatewayTarget,
+          changeOrigin: true,
+        },
+      },
     },
-    // Proxy API requests to the Hermes Gateway on port 8642
-    proxy: {
-      "/health": {
-        target: gatewayTarget,
-        changeOrigin: true,
-      },
-      "/api": {
-        target: gatewayTarget,
-        changeOrigin: true,
-      },
-      "/v1": {
-        target: gatewayTarget,
-        changeOrigin: true,
-      },
-    },
-  },
-}));
+  };
+});
