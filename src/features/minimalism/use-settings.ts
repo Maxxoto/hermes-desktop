@@ -27,6 +27,9 @@ export interface OverlaySettings {
   defaultMode: "type" | "ptt" | "vad";
   theme: "dark" | "light" | "system";
 
+  // Screen share
+  screenShareEnabled: boolean;
+
   // Actions
   setSTTModel: (model: string) => void;
   setSTTLanguage: (lang: string) => void;
@@ -45,6 +48,7 @@ export interface OverlaySettings {
   setOverlayOpacity: (opacity: number) => void;
   setDefaultMode: (mode: "type" | "ptt" | "vad") => void;
   setTheme: (theme: "dark" | "light" | "system") => void;
+  setScreenShareEnabled: (enabled: boolean) => void;
 }
 
 export const useSettings = create<OverlaySettings>()(
@@ -68,6 +72,7 @@ export const useSettings = create<OverlaySettings>()(
       overlayOpacity: 100,
       defaultMode: "type",
       theme: "dark",
+      screenShareEnabled: true,
 
       // Actions
       setSTTModel: (model) => set({ sttModel: model }),
@@ -93,6 +98,8 @@ export const useSettings = create<OverlaySettings>()(
       setOverlayOpacity: (opacity) => set({ overlayOpacity: opacity }),
       setDefaultMode: (mode) => set({ defaultMode: mode }),
       setTheme: (theme) => set({ theme }),
+      setScreenShareEnabled: (enabled) =>
+        set({ screenShareEnabled: enabled }),
     }),
     { name: "hermes-overlay-settings" },
   ),

@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Send, X, Keyboard, Mic, Activity, Volume2, VolumeX, Settings } from "lucide-react";
+import { Send, X, Keyboard, Mic, Activity, Volume2, VolumeX, Settings, Monitor, MonitorOff } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useOverlayMode, type OverlayMode } from "./use-overlay-window";
 import { useVoiceRecorder } from "./use-voice-recorder";
 import { useVAD, type VADStatus } from "./use-vad";
 import { useTTS } from "./use-tts";
+import { useScreenShare } from "./use-screen-share";
 import { VoiceButton } from "./VoiceButton";
+import { ScreenPreview } from "./ScreenPreview";
+import { ScreenshotThumbnail } from "./ScreenshotThumbnail";
 import { StatusIndicator, type IndicatorState } from "./StatusIndicator";
 import {
   GatewayClient,
@@ -51,6 +54,11 @@ export default function CompactChat({
   // TTS for assistant responses
   const tts = useTTS();
 
+  // Screen share
+  const screenShare = useScreenShare();
+  const [pendingScreenshot, setPendingScreenshot] = useState<string | null>(null);
+  const [isCapturing, setIsCapturing] = useState(false);
+
   // Update input text from voice transcript
   useEffect(() => {
     if (mode === "ptt" && voiceRecorder.transcript) {
@@ -82,6 +90,27 @@ export default function CompactChat({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Clean up screen share on unmount
+  useEffect(() => {
+    return () => {
+      screenShare.stopSharing();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Handle screenshot capture from screen share
+  const handleScreenCapture = useCallback(() => {
+    setIsCapturing(true);
+    // Small delay for visual feedback
+    setTimeout(() => {
+      const screenshot = screenShare.captureScreenshot();
+      if (screenshot) {
+        setPendingScreenshot(screenshot);
+      }
+      setIsCapturing(false);
+    }, 150);
+  }, [screenShare]);
+
   // Auto-scroll messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -89,6 +118,8 @@ export default function CompactChat({
 
   // Derive status indicator state
   const getIndicatorState = (): IndicatorState => {
+    if (isCapturing) return "capturing";
+    if (screenShare.isSharing) return "screen-sharing";
     if (isStreaming) return "thinking";
     if (tts.status === "speaking") return "tts-speaking";
     if (mode === "ptt" && voiceRecorder.status === "loading-model")
@@ -129,12 +160,17 @@ export default function CompactChat({
 
   // Send message to Gateway
   const handleSend = useCallback(
-    async (text: string) => {
+    async (text: string, screenshot?: string) => {
       const trimmed = text.trim();
-      if (!trimmed || isStreaming) return;
+      const hasScreenshot = !!screenshot;
+      if ((!trimmed && !hasScreenshot) || isStreaming) return;
 
       setInputText("");
-      setMessages((prev) => [...prev, { role: "user", content: trimmed }]);
+      setPendingScreenshot(null);
+
+      // Build user message content (show text or note about screenshot)
+      const userContent = trimmed || (hasScreenshot ? "[Screenshot]" : "");
+      setMessages((prev) => [...prev, { role: "user", content: userContent }]);
 
       const client = getClient();
       if (!client) {
@@ -174,7 +210,7 @@ export default function CompactChat({
       try {
         await client.chatStream(
           currentSessionId,
-          trimmed,
+          trimmed || (hasScreenshot ? "Please analyze this screenshot." : ""),
           (event: GatewayEvent) => {
             switch (event.type) {
               case "assistant.delta":
@@ -226,6 +262,7 @@ export default function CompactChat({
                 break;
             }
           },
+          hasScreenshot && screenshot ? { images: [screenshot] } : undefined,
         );
       } catch {
         setMessages((prev) => {
@@ -246,6 +283,15 @@ export default function CompactChat({
     },
     [isStreaming, sessionId, getClient],
   );
+
+  // Handle send with optional screenshot
+  const handleSendWithScreenshot = useCallback(() => {
+    if (pendingScreenshot) {
+      handleSend(inputText, pendingScreenshot);
+    } else {
+      handleSend(inputText);
+    }
+  }, [inputText, pendingScreenshot, handleSend]);
 
   // Auto-play TTS for new assistant messages (when not muted)
   useEffect(() => {
@@ -289,10 +335,10 @@ export default function CompactChat({
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
-        handleSend(inputText);
+        handleSendWithScreenshot();
       }
     },
-    [inputText, handleSend],
+    [inputText, handleSendWithScreenshot],
   );
 
   // Close overlay
@@ -412,6 +458,36 @@ export default function CompactChat({
             <span>{modeLabels[mode].label}</span>
           </button>
 
+          {/* Screen share button */}
+          <button
+            onClick={
+              screenShare.isSharing
+                ? () => {
+                    screenShare.stopSharing();
+                  }
+                : () => {
+                    screenShare.startSharing();
+                  }
+            }
+            title={screenShare.isSharing ? "Stop screen sharing" : "Share screen"}
+            aria-label={
+              screenShare.isSharing ? "Stop screen sharing" : "Share screen"
+            }
+            className={cn(
+              "flex items-center justify-center w-6 h-6 rounded-full",
+              "mac-icon-btn transition-all duration-150",
+              screenShare.isSharing
+                ? "text-[#FF453A]"
+                : "dark:text-mac-secondary-label light:text-gray-400",
+            )}
+          >
+            {screenShare.isSharing ? (
+              <MonitorOff className="h-3 w-3" />
+            ) : (
+              <Monitor className="h-3 w-3" />
+            )}
+          </button>
+
           {/* Settings button */}
           {onOpenSettings && (
             <button
@@ -435,6 +511,16 @@ export default function CompactChat({
           </button>
         </div>
       </div>
+
+      {/* Screen preview — shown when sharing */}
+      {screenShare.isSharing && screenShare.stream && (
+        <div className="px-3 pt-2">
+          <ScreenPreview
+            stream={screenShare.stream}
+            onCapture={handleScreenCapture}
+          />
+        </div>
+      )}
 
       {/* Messages area — scrollable */}
       <div
@@ -487,12 +573,21 @@ export default function CompactChat({
 
       {/* Input area */}
       <div
-        className="px-3 py-2 flex items-end gap-2"
+        className="px-3 py-2 flex flex-col gap-1.5"
         style={{
           borderTop: "1px solid var(--mac-separator)",
           background: "var(--mac-toolbar)",
         }}
       >
+        {/* Pending screenshot thumbnail */}
+        {pendingScreenshot && (
+          <ScreenshotThumbnail
+            dataUrl={pendingScreenshot}
+            onRemove={() => setPendingScreenshot(null)}
+          />
+        )}
+
+        <div className="flex items-end gap-2">
         {mode === "ptt" && (
           <VoiceButton
             status={voiceRecorder.status}
@@ -535,8 +630,8 @@ export default function CompactChat({
         />
 
         <button
-          onClick={() => handleSend(inputText)}
-          disabled={isStreaming || !inputText.trim()}
+          onClick={handleSendWithScreenshot}
+          disabled={isStreaming || (!inputText.trim() && !pendingScreenshot)}
           title="Send"
           aria-label="Send message"
           className={cn(
@@ -550,6 +645,7 @@ export default function CompactChat({
         >
           <Send className="h-3.5 w-3.5" />
         </button>
+        </div>
       </div>
     </div>
   );

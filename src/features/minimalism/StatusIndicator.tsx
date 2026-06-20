@@ -10,7 +10,9 @@ export type IndicatorState =
   | "error"
   | "loading-model"
   | "transcribing"
-  | "tts-speaking";
+  | "tts-speaking"
+  | "screen-sharing"
+  | "capturing";
 
 interface StatusIndicatorProps {
   state: IndicatorState;
@@ -47,6 +49,16 @@ export function StatusIndicator({ state, className }: StatusIndicatorProps) {
       color: "bg-purple-500",
       pulse: true,
       label: "Speaking...",
+    },
+    "screen-sharing": {
+      color: "bg-mac-accent",
+      pulse: true,
+      label: "Screen shared",
+    },
+    capturing: {
+      color: "bg-purple-500",
+      pulse: true,
+      label: "Capturing...",
     },
   };
 

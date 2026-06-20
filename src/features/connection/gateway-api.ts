@@ -275,21 +275,35 @@ export class GatewayClient {
     sessionId: string,
     message: string,
     onEvent: OnGatewayEvent,
-    options?: { agent?: string; model?: string },
+    options?: {
+      agent?: string;
+      model?: string;
+      images?: string[];
+    },
   ): Promise<void> {
     const url = `${this.baseUrl}/api/sessions/${encodeURIComponent(sessionId)}/chat/stream`;
 
     this.abortController = new AbortController();
 
+    // Build request body — include images as base64 data URLs if provided
+    const body: Record<string, unknown> = {
+      message,
+      ...(options?.agent && { agent: options.agent }),
+      ...(options?.model && { model: options.model }),
+    };
+    if (options?.images && options.images.length > 0) {
+      body.images = options.images.map((dataUrl) => ({
+        type: "image",
+        data: dataUrl,
+        mime_type: "image/png",
+      }));
+    }
+
     try {
       const res = await fetch(url, {
         method: "POST",
         headers: this.headers({ Accept: "text/event-stream" }),
-        body: JSON.stringify({
-          message,
-          ...(options?.agent && { agent: options.agent }),
-          ...(options?.model && { model: options.model }),
-        }),
+        body: JSON.stringify(body),
         signal: this.abortController.signal,
       });
 
