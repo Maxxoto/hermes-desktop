@@ -2,6 +2,10 @@ import { useState, useMemo, useRef, useEffect } from 'react';
 import { MessageSquarePlus, Search, MessageSquare } from 'lucide-react';
 import { useSessions } from './use-sessions';
 import SessionItem from './SessionItem';
+import FolderTree from '../folders/FolderTree';
+import TagFilter from '../tags/TagFilter';
+import { useFolderStore } from '../folders/use-folders';
+import { useTagStore } from '../tags/use-tags';
 import type { Session } from '../connection/gateway-api';
 
 interface SessionListProps {
@@ -88,7 +92,14 @@ export default function SessionList({
 }: SessionListProps) {
   const { data: sessions, isLoading } = useSessions();
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+  const [selectedTagId, setSelectedTagId] = useState<string | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const getSessionsInFolder = useFolderStore((s) => s.getSessionsInFolder);
+  const sessionFolders = useFolderStore((s) => s.sessionFolders);
+  const getSessionsWithTag = useTagStore((s) => s.getSessionsWithTag);
+  const sessionTags = useTagStore((s) => s.sessionTags);
 
   // Listen for Cmd/Ctrl+K to focus search
   useEffect(() => {
@@ -102,16 +113,46 @@ export default function SessionList({
 
   const filteredSessions = useMemo(() => {
     if (!sessions) return [];
-    if (!searchQuery.trim()) return sessions;
+    let result = sessions;
 
-    const query = searchQuery.toLowerCase();
-    return sessions.filter((s) => {
-      if (s.title && s.title.toLowerCase().includes(query)) return true;
-      if (s.model && s.model.toLowerCase().includes(query)) return true;
-      if (s.source && s.source.toLowerCase().includes(query)) return true;
-      return false;
-    });
-  }, [sessions, searchQuery]);
+    // Filter by folder
+    if (selectedFolderId !== null) {
+      const folderSessionIds = getSessionsInFolder(selectedFolderId);
+      result = result.filter((s) => folderSessionIds.includes(s.id));
+    } else {
+      // "All Sessions" — exclude sessions that are in any folder
+      const folderSessionIds = new Set(Object.keys(sessionFolders));
+      result = result.filter((s) => !folderSessionIds.has(s.id));
+    }
+
+    // Filter by tag
+    if (selectedTagId !== null) {
+      const tagSessionIds = getSessionsWithTag(selectedTagId);
+      result = result.filter((s) => tagSessionIds.includes(s.id));
+    }
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter((s) => {
+        if (s.title && s.title.toLowerCase().includes(query)) return true;
+        if (s.model && s.model.toLowerCase().includes(query)) return true;
+        if (s.source && s.source.toLowerCase().includes(query)) return true;
+        return false;
+      });
+    }
+
+    return result;
+  }, [
+    sessions,
+    searchQuery,
+    selectedFolderId,
+    selectedTagId,
+    getSessionsInFolder,
+    sessionFolders,
+    getSessionsWithTag,
+    sessionTags,
+  ]);
 
   const grouped = useMemo(
     () => groupSessions(filteredSessions),
@@ -153,6 +194,20 @@ export default function SessionList({
               outline-none transition-all"
           />
         </div>
+      </div>
+
+      {/* Tag filter */}
+      <TagFilter
+        selectedTagId={selectedTagId}
+        onSelectTag={setSelectedTagId}
+      />
+
+      {/* Folder tree */}
+      <div className="shrink-0 border-b dark:border-mac-separator light:border-gray-200">
+        <FolderTree
+          selectedFolderId={selectedFolderId}
+          onSelectFolder={setSelectedFolderId}
+        />
       </div>
 
       {/* Sessions list */}
