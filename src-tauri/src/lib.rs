@@ -10,6 +10,8 @@ use tauri::{
 
 // Module for overlay window management
 mod overlay;
+// Module for window snapping (Rectangle-style)
+mod snap;
 
 const SERVICE_NAME: &str = "hermes-desktop";
 const KEY_URL: &str = "gateway_url";
@@ -152,7 +154,7 @@ pub fn run() {
                 let _ = window.hide();
             }
         })
-        .invoke_handler(tauri::generate_handler![store_credentials, load_credentials,])
+        .invoke_handler(tauri::generate_handler![store_credentials, load_credentials, snap::snap_window])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
