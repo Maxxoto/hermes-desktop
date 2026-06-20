@@ -59,11 +59,14 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           onClick={handleSend}
           disabled={disabled}
           title="Send"
+          aria-label="Send message"
           className={cn(
             "flex-shrink-0 flex items-center justify-center",
             "w-9 h-9 rounded-full",
             "send-btn-glass",
             "text-white",
+            "transition-all duration-150",
+            "active:scale-[0.92]",
             "disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none"
           )}
         >

@@ -82,6 +82,7 @@ export function ExportButton({ messages, sessionTitle, disabled }: ExportButtonP
     <button
       onClick={handleExport}
       title="Export as Markdown"
+      aria-label="Export as Markdown"
       disabled={disabled || messages.length === 0 || exporting}
       className="mac-icon-btn disabled:opacity-30"
     >

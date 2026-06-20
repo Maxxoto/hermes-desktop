@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { MessageSquare, GitFork, Menu, X, Square, LogOut, Sun, Moon } from "lucide-react";
+import { MessageSquare, GitFork, Menu, X, Square, LogOut, Sun, Moon, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useChatStore, type Message } from "./use-chat-store";
 import { ChatInput } from "./ChatInput";
 import { MessageBubble } from "./MessageBubble";
@@ -22,6 +22,8 @@ import { useAgentNotifications } from "../../hooks/use-agent-notifications";
 import { CommandPalette, useCommandPaletteShortcut } from "../command-palette/CommandPalette";
 import { useSessions } from "../sessions/use-sessions";
 import { buildMarkdown } from "./ExportButton";
+
+const SIDEBAR_COLLAPSED_KEY = "hermes-desktop-sidebar-collapsed";
 
 export default function ChatPage() {
   const navigate = useNavigate();
@@ -46,6 +48,20 @@ export default function ChatPage() {
 
   const [showForkDialog, setShowForkDialog] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
+
+  // Desktop sidebar collapse state — persisted to localStorage
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "true";
+  });
+
+  const toggleSidebarCollapsed = useCallback(() => {
+    setSidebarCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(next));
+      return next;
+    });
+  }, []);
 
   // Window title — derive from first user message or session ID
   const sessionTitle = sessionId
@@ -331,23 +347,29 @@ export default function ChatPage() {
   return (
     <div className="flex flex-1 min-h-0 dark:text-mac-label light:text-black overflow-hidden"
       style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16162a 50%, #0f0f23 100%)' }}>
-      {/* Sidebar — glass panel */}
-      <aside className={`sidebar vibrancy-sidebar glass-border-r
-        fixed inset-0 z-50 md:static md:z-auto
-        md:w-60 md:flex-shrink-0
-        flex flex-col transition-transform duration-200
-        ${showSidebar ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+      {/* Sidebar — glass panel with desktop collapse */}
+      <aside
+        data-testid="sidebar"
+        className={`sidebar vibrancy-sidebar glass-border-r
+          fixed inset-0 z-50 md:static md:z-auto
+          flex flex-col sidebar-collapse-transition overflow-hidden
+          ${showSidebar ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+          ${sidebarCollapsed ? 'md:w-0 md:min-w-0' : 'md:w-60 md:flex-shrink-0'}
+        `}
+      >
         <div className="flex items-center justify-between px-4 pt-3 pb-1 md:hidden">
           <span className="text-[13px] font-semibold dark:text-mac-secondary-label light:text-gray-600">Sessions</span>
-          <button onClick={() => setShowSidebar(false)} className="mac-icon-btn">
+          <button onClick={() => setShowSidebar(false)} className="mac-icon-btn" aria-label="Close sessions">
             <X className="h-4 w-4" />
           </button>
         </div>
-        <SessionList
-          activeSessionId={sessionId}
-          onSelectSession={handleSelectSession}
-          onNewChat={() => { handleNewSession(); setShowSidebar(false); }}
-        />
+        <div className={`${sidebarCollapsed ? 'md:hidden' : ''}`}>
+          <SessionList
+            activeSessionId={sessionId}
+            onSelectSession={handleSelectSession}
+            onNewChat={() => { handleNewSession(); setShowSidebar(false); }}
+          />
+        </div>
       </aside>
       {/* Overlay backdrop for mobile */}
       {showSidebar && (
@@ -359,12 +381,27 @@ export default function ChatPage() {
         {/* Toolbar — glass panel */}
         <header className="toolbar vibrancy-toolbar flex items-center justify-between px-2 sm:px-4 glass-border-b min-h-[44px]">
           <div className="flex items-center gap-2 min-w-0">
+            {/* Mobile menu button */}
             <button
               onClick={() => setShowSidebar(true)}
               className="mac-icon-btn md:hidden"
               title="Open sessions"
+              aria-label="Open sessions"
             >
               <Menu className="h-4 w-4" />
+            </button>
+            {/* Desktop sidebar collapse toggle */}
+            <button
+              onClick={toggleSidebarCollapsed}
+              className="mac-icon-btn hidden md:flex"
+              title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              aria-label="Toggle sidebar"
+            >
+              {sidebarCollapsed ? (
+                <PanelLeftOpen className="h-4 w-4" />
+              ) : (
+                <PanelLeftClose className="h-4 w-4" />
+              )}
             </button>
             <MessageSquare className="h-4 w-4 dark:text-mac-blue light:text-blue-600 flex-shrink-0 hidden sm:block" />
             <span className="text-[13px] font-medium truncate">
@@ -378,6 +415,7 @@ export default function ChatPage() {
             <button
               onClick={() => setShowForkDialog(true)}
               title="Fork session"
+              aria-label="Fork session"
               className="mac-icon-btn"
               disabled={!sessionId}
             >
@@ -394,6 +432,7 @@ export default function ChatPage() {
             <button
               onClick={toggleTheme}
               title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
               className="mac-icon-btn"
             >
               {theme === "dark" ? (
@@ -405,6 +444,7 @@ export default function ChatPage() {
             <button
               onClick={handleLogout}
               title="Disconnect and go back"
+              aria-label="Disconnect"
               className="mac-icon-btn"
             >
               <LogOut className="h-4 w-4" />
@@ -423,13 +463,26 @@ export default function ChatPage() {
           <div className="max-w-3xl mx-auto">
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full dark:text-mac-tertiary-label light:text-gray-400 min-h-[60vh]">
-                <MessageSquare className="h-10 w-10 sm:h-12 sm:w-12 mb-3 opacity-40" />
-                <p className="text-[13px]">Start a conversation</p>
+                <div className="relative">
+                  {/* Ambient blob behind the icon */}
+                  <div className="ambient-blob w-24 h-24 dark:bg-mac-accent/20 light:bg-blue-400/15 -top-4 -left-4" style={{ animationDelay: "0s" }} />
+                  <MessageSquare className="h-14 w-14 sm:h-16 sm:w-16 mb-3 opacity-30 relative z-10" />
+                </div>
+                <p className="text-[13px] font-medium mt-2">Start a conversation</p>
+                <p className="text-[11px] mt-1 opacity-60">Your messages will appear here</p>
               </div>
             )}
             {messages.map((msg) => (
               <MessageBubble key={msg.id} message={msg} />
             ))}
+            {/* Typing indicator when streaming with empty response */}
+            {isStreaming && messages.length > 0 && messages[messages.length - 1]?.content === "" && (
+              <div className="flex items-center gap-1.5 px-3 py-2 dark:text-mac-tertiary-label light:text-gray-400">
+                <span className="typing-dot inline-block w-1.5 h-1.5 rounded-full dark:bg-mac-secondary-label light:bg-gray-400" />
+                <span className="typing-dot inline-block w-1.5 h-1.5 rounded-full dark:bg-mac-secondary-label light:bg-gray-400" />
+                <span className="typing-dot inline-block w-1.5 h-1.5 rounded-full dark:bg-mac-secondary-label light:bg-gray-400" />
+              </div>
+            )}
             <div ref={messagesEndRef} />
           </div>
         </div>
@@ -441,6 +494,7 @@ export default function ChatPage() {
               <button
                 onClick={handleStopGeneration}
                 title="Stop generation"
+                aria-label="Stop generation"
                 className="mac-icon-btn !w-9 !h-9 dark:hover:!bg-mac-red/20 dark:hover:text-mac-red light:hover:!bg-red-500/20 light:hover:text-red-500"
               >
                 <Square className="h-4 w-4" />

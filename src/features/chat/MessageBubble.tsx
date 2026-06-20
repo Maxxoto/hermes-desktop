@@ -57,15 +57,16 @@ export function MessageBubble({ message }: MessageBubbleProps) {
       {/* Copy button — appears on hover */}
       <div
         className={cn(
-          "flex items-center self-center opacity-0 group-hover:opacity-100 transition-opacity",
+          "flex items-center self-center opacity-0 group-hover:opacity-100 transition-opacity duration-200",
           isUser ? "order-first mr-1" : "ml-1"
         )}
       >
         <button
           onClick={handleCopy}
           title={copied ? "Copied!" : "Copy message"}
+          aria-label={copied ? "Copied!" : "Copy message"}
           className={cn(
-            "mac-icon-btn !w-7 !h-7",
+            "mac-icon-btn !w-7 !h-7 transition-all duration-150 active:scale-[0.92]",
             copied
               ? "dark:text-mac-green light:text-green-600"
               : "dark:text-mac-tertiary-label light:text-gray-400"

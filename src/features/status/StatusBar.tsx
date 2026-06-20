@@ -10,7 +10,7 @@ export default function StatusBar() {
     !isLoading && !isError && data !== undefined && isConnected(data.status);
 
   return (
-    <footer className="flex items-center justify-between vibrancy-statusbar px-5 text-[10px] dark:text-mac-tertiary-label light:text-gray-400"
+    <footer role="status" className="flex items-center justify-between vibrancy-statusbar px-5 text-[10px] dark:text-mac-tertiary-label light:text-gray-400"
       style={{ height: "26px" }}>
       {/* Left — Connection indicator */}
       <div className="flex items-center gap-2">

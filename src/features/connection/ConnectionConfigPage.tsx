@@ -127,7 +127,7 @@ export default function ConnectionConfigPage() {
           )}
 
           {testMutation.isError && (
-            <div className="p-3 rounded-lg text-[13px]"
+            <div role="alert" className="p-3 rounded-lg text-[13px]"
               style={{ background: "rgba(255, 69, 58, 0.1)", border: "1px solid rgba(255, 69, 58, 0.2)" }}>
               <p className="dark:text-mac-red light:text-red-500">
                 Connection failed:{" "}
@@ -139,7 +139,7 @@ export default function ConnectionConfigPage() {
           )}
 
           {testMutation.isSuccess && (
-            <div className="p-3 rounded-lg text-[13px]"
+            <div role="status" className="p-3 rounded-lg text-[13px]"
               style={{ background: "rgba(48, 209, 88, 0.1)", border: "1px solid rgba(48, 209, 88, 0.2)" }}>
               <p className="dark:text-mac-green light:text-green-600">
                 Connected! Status: <span className="font-semibold">{testMutation.data.status}</span>

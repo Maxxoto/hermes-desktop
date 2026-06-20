@@ -226,7 +226,7 @@ export default function SessionItem({ session, isActive, onClick }: SessionItemP
           ? "dark:bg-white/10 light:bg-black/10"
           : "dark:hover:bg-white/5 light:hover:bg-black/5"
         }`}
-      style={{ width: "calc(100% - 16px)", minHeight: "28px" }}
+      style={{ width: "calc(100% - 16px)", minHeight: "32px" }}
     >
       <div className="mt-0.5 shrink-0">
         <Icon className="w-4 h-4 opacity-80 dark:text-mac-secondary-label light:text-gray-500" />
