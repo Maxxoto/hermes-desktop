@@ -12,7 +12,7 @@ interface ExportButtonProps {
  * Build a markdown string from chat messages.
  * Format: # {title}\n\n**User:** message\n\n**Assistant:** message\n\n
  */
-function buildMarkdown(title: string, messages: Message[]): string {
+export function buildMarkdown(title: string, messages: Message[]): string {
   const lines: string[] = [`# ${title}`, ""];
 
   for (const msg of messages) {

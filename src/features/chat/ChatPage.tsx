@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useEffect, useRef, useCallback, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { MessageSquare, GitFork, Menu, X, Square, LogOut, Sun, Moon } from "lucide-react";
 import { useChatStore, type Message } from "./use-chat-store";
@@ -19,6 +19,9 @@ import { useKeyboardShortcuts } from "../../hooks/use-keyboard-shortcuts";
 import { useTheme } from "../../hooks/use-theme";
 import { useDeleteSession } from "../sessions/use-sessions";
 import { useAgentNotifications } from "../../hooks/use-agent-notifications";
+import { CommandPalette, useCommandPaletteShortcut } from "../command-palette/CommandPalette";
+import { useSessions } from "../sessions/use-sessions";
+import { buildMarkdown } from "./ExportButton";
 
 export default function ChatPage() {
   const navigate = useNavigate();
@@ -58,6 +61,57 @@ export default function ChatPage() {
 
   // Theme toggle
   const { theme, toggleTheme } = useTheme();
+
+  // Command palette
+  const [showCommandPalette, setShowCommandPalette] = useState(false);
+
+  // Sessions for the command palette
+  const { data: paletteSessions = [] } = useSessions();
+
+  // Cmd+K / Ctrl+K toggles the palette
+  useCommandPaletteShortcut(useCallback(() => {
+    setShowCommandPalette((prev) => !prev);
+  }, []));
+
+  // ── Command palette action handlers ──────────────────────────────────────
+
+  const handlePaletteExport = useCallback(() => {
+    if (messages.length === 0) return;
+    const safeFilename = sessionTitle
+      .replace(/[^a-z0-9\-_ ]/gi, "")
+      .trim()
+      .slice(0, 60) || "chat";
+    const markdown = buildMarkdown(sessionTitle, messages);
+    const blob = new Blob([markdown], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${safeFilename}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [messages, sessionTitle]);
+
+  const handlePaletteCopyId = useCallback(async () => {
+    if (!sessionId) return;
+    try {
+      await navigator.clipboard.writeText(sessionId);
+    } catch {
+      // clipboard API may not be available — ignore
+    }
+  }, [sessionId]);
+
+  const handlePaletteGoSettings = useCallback(() => {
+    navigate("/connection");
+  }, [navigate]);
+
+  const handlePaletteGoCurrent = useCallback(() => {
+    const input = document.querySelector<HTMLInputElement>(
+      "textarea[data-chat-input], input[data-chat-input]"
+    );
+    input?.focus();
+  }, []);
 
   // Keyboard shortcuts
   useKeyboardShortcuts({
@@ -250,6 +304,30 @@ export default function ChatPage() {
     navigate("/");
   }, [navigate]);
 
+  // Command palette actions — assembled after all handlers are defined
+  const paletteActions = useMemo(
+    () => ({
+      onNewSession: handleNewSession,
+      onToggleTheme: toggleTheme,
+      onExportChat: handlePaletteExport,
+      onDisconnect: handleLogout,
+      onCopySessionId: handlePaletteCopyId,
+      onGoToSettings: handlePaletteGoSettings,
+      onGoToCurrentSession: handlePaletteGoCurrent,
+      onSelectSession: handleSelectSession,
+    }),
+    [
+      handleNewSession,
+      toggleTheme,
+      handlePaletteExport,
+      handleLogout,
+      handlePaletteCopyId,
+      handlePaletteGoSettings,
+      handlePaletteGoCurrent,
+      handleSelectSession,
+    ],
+  );
+
   return (
     <div className="flex flex-1 min-h-0 dark:bg-mac-content light:bg-white dark:text-mac-label light:text-black overflow-hidden">
       {/* Sidebar — hidden on mobile, overlay when toggled */}
@@ -373,6 +451,15 @@ export default function ChatPage() {
           </div>
         </div>
       </div>
+
+      {/* Command Palette — Cmd+K / Ctrl+K */}
+      <CommandPalette
+        open={showCommandPalette}
+        onClose={() => setShowCommandPalette(false)}
+        sessions={paletteSessions}
+        currentSessionId={sessionId}
+        actions={paletteActions}
+      />
     </div>
   );
 }

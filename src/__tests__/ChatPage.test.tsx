@@ -44,6 +44,7 @@ const mockAutoTitleMutate = vi.fn();
 const mockDeleteMutate = vi.fn();
 
 vi.mock("../features/sessions/use-sessions", () => ({
+  useSessions: () => ({ data: [] }),
   useAutoTitle: () => ({ mutate: mockAutoTitleMutate, isPending: false }),
   useDeleteSession: () => ({ mutate: mockDeleteMutate, isPending: false }),
 }));
