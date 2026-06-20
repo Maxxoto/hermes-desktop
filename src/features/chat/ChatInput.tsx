@@ -35,7 +35,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
   };
 
   return (
-    <div className="border-t dark:border-mac-separator light:border-gray-200 dark:bg-mac-content light:bg-white px-5 py-3">
+    <div className="glass-border-t dark:bg-mac-content/80 light:bg-white/80 backdrop-blur-xl px-5 py-3">
       <div className="flex items-end gap-2 max-w-4xl mx-auto">
         <textarea
           ref={textareaRef}
@@ -45,12 +45,13 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           placeholder="Type a message…"
           rows={1}
           className={cn(
-            "flex-1 resize-none rounded-lg border px-3.5 py-2.5",
+            "flex-1 resize-none rounded-xl px-3.5 py-2.5",
             "text-[13px] leading-4 min-h-[44px]",
-            "dark:bg-white/5 dark:border-white/10 dark:text-mac-label dark:placeholder:text-mac-tertiary-label",
-            "light:bg-black/5 light:border-black/10 light:text-black light:placeholder:text-gray-400",
-            "focus:outline-none focus:border-[var(--mac-accent)] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]",
-            "transition-colors",
+            "glass-input",
+            "dark:text-mac-label dark:placeholder:text-mac-tertiary-label",
+            "light:text-black light:placeholder:text-gray-400",
+            "focus:outline-none",
+            "transition-all",
             disabled && "opacity-50 cursor-not-allowed"
           )}
         />
@@ -61,8 +62,9 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           className={cn(
             "flex-shrink-0 flex items-center justify-center",
             "w-8 h-8 rounded-full transition-all",
-            "bg-[var(--mac-accent)] text-white",
-            "hover:opacity-90 active:opacity-80",
+            "bg-[var(--mac-accent)] text-white shadow-lg shadow-blue-500/20",
+            "hover:bg-[var(--mac-accent-hover)] hover:shadow-blue-500/30",
+            "active:scale-95",
             "disabled:opacity-30 disabled:cursor-not-allowed"
           )}
         >

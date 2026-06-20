@@ -141,13 +141,10 @@ export default function SessionList({
             placeholder="Search conversations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-[22px] pl-7 pr-2 rounded-[4px]
-              dark:bg-mac-control dark:border-[rgba(255,255,255,0.1)] dark:text-mac-label
-              light:bg-white light:border-gray-300 light:text-black
-              border text-[13px] dark:placeholder:text-mac-tertiary-label light:placeholder:text-gray-400
-              focus:outline-none focus:border-[var(--mac-accent)]
-              focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]
-              transition-colors"
+            className="w-full h-[26px] pl-7 pr-2 glass-input
+              dark:text-mac-label light:text-black
+              text-[13px] dark:placeholder:text-mac-tertiary-label light:placeholder:text-gray-400
+              outline-none transition-all"
           />
         </div>
       </div>

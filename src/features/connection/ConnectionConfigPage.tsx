@@ -43,7 +43,6 @@ export default function ConnectionConfigPage() {
 
   const handleSave = async () => {
     if (!url.trim() || !key.trim()) return;
-
     setCredentials(url.trim(), key.trim());
 
     // Persist credentials — Tauri keychain or localStorage fallback
@@ -67,10 +66,9 @@ export default function ConnectionConfigPage() {
   };
 
   // ---- render ------------------------------------------------------------
-
   return (
     <div className="flex min-h-dvh items-center justify-center dark:bg-mac-window light:bg-[#ECECEC] px-4">
-      <div className="w-full max-w-md rounded-lg border dark:bg-mac-surface dark:border-white/[0.08] light:bg-white light:border-gray-200 p-8 shadow-xl">
+      <div className="w-full max-w-md glass-surface rounded-xl p-8 shadow-2xl">
         {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="text-[17px] font-bold dark:text-mac-label light:text-black">Hermes Desktop</h1>
@@ -95,8 +93,10 @@ export default function ConnectionConfigPage() {
               placeholder="https://gateway.example.com"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              className="w-full rounded-[4px] border dark:bg-mac-control dark:border-white/10 dark:text-mac-label dark:placeholder:text-mac-tertiary-label light:bg-white light:border-gray-300 light:text-black light:placeholder:text-gray-400 outline-none transition-colors focus:border-[var(--mac-accent)] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] text-[13px]"
-              style={{ height: "22px", padding: "0 8px" }}
+              className="w-full glass-input px-3 py-1.5 outline-none text-[13px]
+                dark:text-mac-label dark:placeholder:text-mac-tertiary-label
+                light:text-black light:placeholder:text-gray-400
+                transition-all"
             />
           </div>
 
@@ -114,8 +114,10 @@ export default function ConnectionConfigPage() {
               placeholder="sk-..."
               value={key}
               onChange={(e) => setKey(e.target.value)}
-              className="w-full rounded-[4px] border dark:bg-mac-control dark:border-white/10 dark:text-mac-label dark:placeholder:text-mac-tertiary-label light:bg-white light:border-gray-300 light:text-black light:placeholder:text-gray-400 outline-none transition-colors focus:border-[var(--mac-accent)] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)] text-[13px]"
-              style={{ height: "22px", padding: "0 8px" }}
+              className="w-full glass-input px-3 py-1.5 outline-none text-[13px]
+                dark:text-mac-label dark:placeholder:text-mac-tertiary-label
+                light:text-black light:placeholder:text-gray-400
+                transition-all"
             />
           </div>
 

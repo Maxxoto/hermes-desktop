@@ -169,13 +169,12 @@ export function CommandPalette({
       {/* Backdrop */}
       <div className="absolute inset-0 backdrop-blur-sm bg-black/40" />
 
-      {/* Card */}
+      {/* Card — glass panel */}
       <div
         className="relative w-[90vw] max-w-[640px] max-h-[60vh] flex flex-col
-                   rounded-lg overflow-hidden
-                   bg-[var(--mac-surface)]
-                   border border-[rgba(255,255,255,0.08)]
-                   shadow-[0_24px_70px_rgba(0,0,0,0.5)]
+                   rounded-xl overflow-hidden
+                   glass-surface
+                   shadow-[0_24px_80px_rgba(0,0,0,0.6)]
                    animate-cmdk-scale select-none"
         onClick={(e) => e.stopPropagation()}
       >
@@ -187,7 +186,7 @@ export function CommandPalette({
         >
           {/* Search input row */}
           <div
-            className="flex items-center gap-2 px-3 border-b border-[rgba(255,255,255,0.08)]"
+            className="flex items-center gap-2 px-3 glass-border-b"
           >
             <Search className="w-4 h-4 text-[var(--mac-tertiary-label)] flex-shrink-0" />
             <Command.Input

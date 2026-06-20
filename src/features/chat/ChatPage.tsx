@@ -330,10 +330,10 @@ export default function ChatPage() {
 
   return (
     <div className="flex flex-1 min-h-0 dark:bg-mac-content light:bg-white dark:text-mac-label light:text-black overflow-hidden">
-      {/* Sidebar — hidden on mobile, overlay when toggled */}
-      <aside className={`sidebar vibrancy-sidebar
+      {/* Sidebar — glass panel */}
+      <aside className={`sidebar vibrancy-sidebar glass-border-r
         fixed inset-0 z-50 md:static md:z-auto
-        md:w-60 md:flex-shrink-0 md:border-r md:dark:border-mac-separator md:light:border-gray-200
+        md:w-60 md:flex-shrink-0
         flex flex-col transition-transform duration-200
         ${showSidebar ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         <div className="flex items-center justify-between px-4 pt-3 pb-1 md:hidden">
@@ -355,8 +355,8 @@ export default function ChatPage() {
 
       {/* Main chat area */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Toolbar — vibrancy */}
-        <header className="toolbar vibrancy-toolbar flex items-center justify-between px-2 sm:px-4 border-b dark:border-mac-separator light:border-gray-200 min-h-[44px]">
+        {/* Toolbar — glass panel */}
+        <header className="toolbar vibrancy-toolbar flex items-center justify-between px-2 sm:px-4 glass-border-b min-h-[44px]">
           <div className="flex items-center gap-2 min-w-0">
             <button
               onClick={() => setShowSidebar(true)}
