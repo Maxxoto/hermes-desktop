@@ -117,15 +117,16 @@ pub fn run() {
             let menu = Menu::with_items(app, &[&show, &quit])?;
 
             // Load tray icon
-            if let Ok(icon) = Image::from_bytes(include_bytes!("../icons/icon.png")) {
+            let icon_bytes = include_bytes!("../icons/icon.png");
+            if let Ok(icon) = Image::from_bytes(icon_bytes) {
                 TrayIconBuilder::new()
                     .icon(icon)
                     .tooltip("Hermes Desktop")
                     .menu(&menu)
-                    .on_menu_event(|app, event| match event.id.as_ref() {
+                    .on_menu_event(|app: &AppHandle, event| match event.id.as_ref() {
                         "show" => {
                             if let Some(window) = app.get_webview_window("main") {
-                                let _ = window.unminimize();
+                                let _: Result<(), tauri::Error> = window.unminimize();
                                 let _ = window.show();
                                 let _ = window.set_focus();
                             }
