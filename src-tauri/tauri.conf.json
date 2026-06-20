@@ -42,14 +42,6 @@
     ]
   },
   "plugins": {
-    "updater": {
-      "active": false,
-      "endpoints": [
-        "https://releases.example.com/hermes-desktop/{{target}}/{{arch}}/{{current_version}}"
-      ],
-      "pubKey": "UPDATER_PUBKEY_PLACEHOLDER_REPLACE_WITH_REAL_KEY",
-      "dialog": true
-    },
     "deep-link": {
       "desktopSchemes": [
         "hermes"
