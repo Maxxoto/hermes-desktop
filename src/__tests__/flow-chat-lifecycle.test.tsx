@@ -345,6 +345,7 @@ describe("Flow: Chat Lifecycle", () => {
         "existing_sess",
         "Follow up",
         expect.any(Function),
+        expect.objectContaining({}),
       );
     });
     expect(mockCreateSession).not.toHaveBeenCalled();
