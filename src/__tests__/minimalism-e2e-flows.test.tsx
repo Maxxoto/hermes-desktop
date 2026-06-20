@@ -505,7 +505,7 @@ describe("Voice Recording Flow — PTT Mode", () => {
 
     // Click to switch to PTT
     await user.click(toggleBtn);
-    expect(toggleBtn).toHaveTextContent("PTT");
+    expect(toggleBtn).toHaveTextContent("Talk");
 
     // VoiceButton should appear
     expect(
@@ -528,7 +528,7 @@ describe("Voice Recording Flow — PTT Mode", () => {
 
     // Switch to PTT
     await user.click(toggleBtn);
-    expect(toggleBtn).toHaveTextContent("PTT");
+    expect(toggleBtn).toHaveTextContent("Talk");
 
     // Click the mic button to start recording
     const micBtn = screen.getByRole("button", { name: "Start recording" });
@@ -625,10 +625,10 @@ describe("Voice Activity Detection Flow", () => {
 
     // Switch through PTT to VAD
     await user.click(toggleBtn); // → PTT
-    expect(toggleBtn).toHaveTextContent("PTT");
+    expect(toggleBtn).toHaveTextContent("Talk");
 
     await user.click(toggleBtn); // → VAD
-    expect(toggleBtn).toHaveTextContent("VAD");
+    expect(toggleBtn).toHaveTextContent("Listen");
 
     // Input placeholder should change for VAD mode
     expect(screen.getByTestId("compact-input")).toHaveAttribute(
@@ -649,11 +649,11 @@ describe("Voice Activity Detection Flow", () => {
 
     // Type → PTT
     await user.click(toggleBtn);
-    expect(toggleBtn).toHaveTextContent("PTT");
+    expect(toggleBtn).toHaveTextContent("Talk");
 
     // PTT → VAD
     await user.click(toggleBtn);
-    expect(toggleBtn).toHaveTextContent("VAD");
+    expect(toggleBtn).toHaveTextContent("Listen");
 
     // VAD → Type (cycle back)
     await user.click(toggleBtn);
@@ -1484,7 +1484,7 @@ describe("Mode Persistence & Integration", () => {
     const toggleBtn = screen.getByRole("button", {
       name: /Switch mode/,
     });
-    expect(toggleBtn).toHaveTextContent("VAD");
+    expect(toggleBtn).toHaveTextContent("Listen");
 
     // Input placeholder should be VAD-specific
     expect(screen.getByTestId("compact-input")).toHaveAttribute(

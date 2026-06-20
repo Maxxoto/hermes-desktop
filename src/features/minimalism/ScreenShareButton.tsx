@@ -45,7 +45,7 @@ export function ScreenShareButton({
         title={isSharing ? "Stop screen sharing" : "Share screen"}
         aria-label={isSharing ? "Stop screen sharing" : "Share screen"}
         className={cn(
-          "flex items-center justify-center w-6 h-6 rounded-full",
+          "flex items-center justify-center w-7 h-7 rounded-full",
           "mac-icon-btn transition-all duration-150",
           isSharing
             ? "text-[#FF453A]"
@@ -65,7 +65,7 @@ export function ScreenShareButton({
           title="Capture screenshot"
           aria-label="Capture screenshot"
           className={cn(
-            "flex items-center justify-center w-6 h-6 rounded-full",
+            "flex items-center justify-center w-7 h-7 rounded-full",
             "mac-icon-btn transition-all duration-150",
             "text-[#0A84FF]",
           )}

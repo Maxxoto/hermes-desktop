@@ -76,7 +76,7 @@ export function StatusIndicator({ state, className }: StatusIndicatorProps) {
         )}
         aria-label={config.label}
       />
-      <span className="text-[11px] dark:text-mac-secondary-label light:text-gray-400">
+      <span className="text-[12px] dark:text-mac-secondary-label light:text-gray-400">
         {config.label}
       </span>
     </div>

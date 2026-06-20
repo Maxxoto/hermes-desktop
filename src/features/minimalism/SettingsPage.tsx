@@ -302,7 +302,7 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
           onClick={onBack}
           title="Back to chat"
           aria-label="Back to chat"
-          className="mac-icon-btn !w-6 !h-6 mr-2"
+          className="mac-icon-btn !w-7 !h-7 mr-2"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
         </button>
@@ -385,7 +385,7 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
               onClick={handleTestRecording}
               disabled={testStatus === "recording" || testStatus === "transcribing"}
               className={cn(
-                "mac-btn text-[11px] !h-7 flex items-center gap-1.5",
+                "mac-btn text-[12px] !h-7 flex items-center gap-1.5",
                 testStatus === "recording" &&
                   "!bg-mac-red/80 !text-white !border-mac-red",
                 testStatus === "transcribing" &&
@@ -463,7 +463,7 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
               />
               <button
                 onClick={() => setShowApiKey(!showApiKey)}
-                className="mac-btn text-[11px] !h-7"
+                className="mac-btn text-[12px] !h-7"
                 aria-label={showApiKey ? "Hide API key" : "Show API key"}
               >
                 {showApiKey ? "Hide" : "Show"}
@@ -492,7 +492,7 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
               onClick={handleTTSPreview}
               disabled={previewPlaying}
               className={cn(
-                "mac-btn text-[11px] !h-7 flex items-center gap-1.5",
+                "mac-btn text-[12px] !h-7 flex items-center gap-1.5",
                 previewPlaying && "!bg-mac-accent/80 !text-white",
               )}
               aria-label="Preview TTS voice"
@@ -602,7 +602,7 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
                 )}
                 aria-label="Global keyboard shortcut"
               />
-              <button className="mac-btn text-[11px] !h-7">
+              <button className="mac-btn text-[12px] !h-7">
                 Record
               </button>
             </div>

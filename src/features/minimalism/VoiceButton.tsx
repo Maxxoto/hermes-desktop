@@ -93,7 +93,7 @@ export function VoiceButton({
       aria-label={ariaLabel}
       disabled={isDisabled}
       className={cn(
-        "flex items-center justify-center w-7 h-7 rounded-full",
+        "flex items-center justify-center w-8 h-8 rounded-full",
         "transition-all duration-150",
         "active:scale-[0.92]",
         isRecording

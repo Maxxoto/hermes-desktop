@@ -58,6 +58,7 @@ export default function CompactChat({
   const screenShare = useScreenShare();
   const [pendingScreenshot, setPendingScreenshot] = useState<string | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [retryMessage, setRetryMessage] = useState<{text: string; screenshot?: string} | null>(null);
 
   // Update input text from voice transcript
   useEffect(() => {
@@ -167,6 +168,7 @@ export default function CompactChat({
 
       setInputText("");
       setPendingScreenshot(null);
+      setRetryMessage({ text, screenshot });
 
       // Build user message content (show text or note about screenshot)
       const userContent = trimmed || (hasScreenshot ? "[Screenshot]" : "");
@@ -264,6 +266,7 @@ export default function CompactChat({
           },
           hasScreenshot && screenshot ? { images: [screenshot] } : undefined,
         );
+        setRetryMessage(null);
       } catch {
         setMessages((prev) => {
           const msgs = [...prev];
@@ -383,8 +386,8 @@ export default function CompactChat({
   // Mode label
   const modeLabels: Record<OverlayMode, { icon: React.ReactNode; label: string }> = {
     type: { icon: <Keyboard className="h-3 w-3" />, label: "Type" },
-    ptt: { icon: <Mic className="h-3 w-3" />, label: "PTT" },
-    vad: { icon: <Activity className="h-3 w-3" />, label: "VAD" },
+    ptt: { icon: <Mic className="h-3 w-3" />, label: "Talk" },
+    vad: { icon: <Activity className="h-3 w-3" />, label: "Listen" },
   };
 
   // Find the last assistant message index (for replay button)
@@ -426,7 +429,7 @@ export default function CompactChat({
             title={isMuted ? "Unmute TTS" : "Mute TTS"}
             aria-label={isMuted ? "Unmute TTS" : "Mute TTS"}
             className={cn(
-              "flex items-center justify-center w-6 h-6 rounded-full",
+              "flex items-center justify-center w-7 h-7 rounded-full",
               "mac-icon-btn",
               "transition-all duration-150",
               isMuted
@@ -448,10 +451,10 @@ export default function CompactChat({
             aria-label={`Switch mode. Current: ${modeLabels[mode].label}`}
             className={cn(
               "flex items-center gap-1 px-2 py-0.5 rounded-full",
-              "text-[11px] font-medium",
+              "text-[12px] font-medium",
               "transition-all duration-150",
               "mac-btn",
-              "!h-6 !px-2",
+              "!h-7 !px-2",
             )}
           >
             {modeLabels[mode].icon}
@@ -474,7 +477,7 @@ export default function CompactChat({
               screenShare.isSharing ? "Stop screen sharing" : "Share screen"
             }
             className={cn(
-              "flex items-center justify-center w-6 h-6 rounded-full",
+              "flex items-center justify-center w-7 h-7 rounded-full",
               "mac-icon-btn transition-all duration-150",
               screenShare.isSharing
                 ? "text-[#FF453A]"
@@ -494,7 +497,7 @@ export default function CompactChat({
               onClick={onOpenSettings}
               title="Settings"
               aria-label="Open settings"
-              className="mac-icon-btn !w-6 !h-6"
+              className="mac-icon-btn !w-7 !h-7"
             >
               <Settings className="h-3 w-3" />
             </button>
@@ -505,7 +508,7 @@ export default function CompactChat({
             onClick={handleClose}
             title="Close overlay"
             aria-label="Close overlay"
-            className="mac-icon-btn !w-6 !h-6"
+            className="mac-icon-btn !w-7 !h-7"
           >
             <X className="h-3.5 w-3.5" />
           </button>
@@ -528,7 +531,7 @@ export default function CompactChat({
         style={{ minHeight: 0 }}
       >
         {messages.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-[11px] dark:text-mac-tertiary-label light:text-gray-400 opacity-60">
+          <div className="flex items-center justify-center h-full text-[13px] font-medium dark:text-mac-tertiary-label light:text-gray-400 opacity-70">
             Ask anything…
           </div>
         ) : (
@@ -536,7 +539,7 @@ export default function CompactChat({
             <div
               key={i}
               className={cn(
-                "mb-2 text-[12px] leading-4",
+                "mb-2 text-[13px] leading-5",
                 msg.role === "user"
                   ? "dark:text-mac-label light:text-black text-right"
                   : "dark:text-mac-secondary-label light:text-gray-600",
@@ -548,14 +551,24 @@ export default function CompactChat({
                 </span>
               ) : (
                 <div className="flex items-start gap-1">
-                  <span className="message-content flex-1">{msg.content}</span>
+                  <div className="flex-1">
+                    <span className="message-content">{msg.content}</span>
+                    {msg.content.includes("Connection error") && retryMessage && (
+                      <button
+                        onClick={() => handleSend(retryMessage.text, retryMessage.screenshot)}
+                        className="text-[11px] text-mac-accent hover:underline mt-1 block"
+                      >
+                        Retry
+                      </button>
+                    )}
+                  </div>
                   {/* Replay TTS button for last assistant message */}
                   {i === lastAssistantIdx && tts.status !== "speaking" && !isMuted && (
                     <button
                       onClick={handleReplayTTS}
                       title="Replay audio"
                       aria-label="Replay TTS"
-                      className="flex-shrink-0 mt-0.5 mac-icon-btn !w-4 !h-4"
+                      className="flex-shrink-0 mt-0.5 mac-icon-btn !w-5 !h-5"
                     >
                       <Volume2 className="h-2.5 w-2.5" />
                     </button>
@@ -613,7 +626,7 @@ export default function CompactChat({
           rows={1}
           className={cn(
             "flex-1 resize-none rounded-lg px-3 py-2",
-            "text-[12px] leading-4 min-h-[32px] max-h-[80px]",
+            "text-[13px] leading-5 min-h-[32px] max-h-[80px]",
             "glass-input",
             "dark:text-mac-label dark:placeholder:text-mac-tertiary-label",
             "light:text-black light:placeholder:text-gray-400",

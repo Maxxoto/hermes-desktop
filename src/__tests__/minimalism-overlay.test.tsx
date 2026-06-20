@@ -427,11 +427,11 @@ describe("CompactChat", () => {
 
     // Click to cycle to PTT
     await user.click(toggleBtn);
-    expect(toggleBtn).toHaveTextContent("PTT");
+    expect(toggleBtn).toHaveTextContent("Talk");
 
     // Click to cycle to VAD
     await user.click(toggleBtn);
-    expect(toggleBtn).toHaveTextContent("VAD");
+    expect(toggleBtn).toHaveTextContent("Listen");
 
     // Click to cycle back to Type
     await user.click(toggleBtn);
