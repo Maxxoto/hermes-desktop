@@ -17,6 +17,19 @@
         "height": 750,
         "minWidth": 800,
         "minHeight": 500
+      },
+      {
+        "label": "overlay",
+        "title": "Hermes",
+        "width": 400,
+        "height": 300,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "visible": false,
+        "center": true,
+        "resizable": false
       }
     ],
     "security": {

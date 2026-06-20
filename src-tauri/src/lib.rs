@@ -8,6 +8,9 @@ use tauri::{
     AppHandle, Manager, WindowEvent,
 };
 
+// Module for overlay window management
+mod overlay;
+
 const SERVICE_NAME: &str = "hermes-desktop";
 const KEY_URL: &str = "gateway_url";
 const KEY_API_KEY: &str = "api_key";
@@ -109,7 +112,11 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_deep_link::init())
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .setup(|app| {
+            // Register overlay toggle shortcut
+            overlay::register_shortcut(app)?;
+
             // Build tray menu
             let show = MenuItem::with_id(app, "show", "Show Hermes", true, None::<&str>)?;
             let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
