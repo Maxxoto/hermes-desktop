@@ -61,8 +61,8 @@ describe("CompressButton", () => {
 
   // ---- Ruler emoji icon ----------------------------------------------------
 
-  it("displays the ruler emoji icon", () => {
-    render(<CompressButton messageCount={2} />);
-    expect(screen.getByText("📏")).toBeInTheDocument();
+  it("displays the ruler icon", () => {
+    const { container } = render(<CompressButton messageCount={2} />);
+    expect(container.querySelector(".lucide-ruler")).toBeInTheDocument();
   });
 });

@@ -350,9 +350,9 @@ export default function ChatPage() {
               <div className="ambient-blob w-24 h-24 dark:bg-mac-accent/20 light:bg-blue-400/15 -top-4 -left-4" style={{ animationDelay: "0s" }} />
               <MessageSquare className="h-14 w-14 sm:h-16 sm:w-16 mb-3 opacity-30 relative z-10" />
             </div>
-            <p className="text-[13px] font-medium mt-2">Start a conversation</p>
+            <p className="text-[14px] font-semibold mt-2">Start a conversation</p>
             <p className="text-[11px] mt-1 opacity-60">Type a message below to begin chatting with Hermes</p>
-            <p className="text-[10px] mt-3 opacity-40">
+            <p className="text-[10px] mt-4 opacity-30">
               Press <kbd className="px-1 py-0.5 rounded text-[9px]" style={{ background: "rgba(255,255,255,0.08)" }}>⌘K</kbd> for commands
             </p>
           </div>

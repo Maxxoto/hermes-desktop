@@ -209,7 +209,7 @@ export function CommandPalette({
                 className="[&_[cmdk-group-heading]]:px-4 [&_[cmdk-group-heading]]:py-2
                            [&_[cmdk-group-heading]]:text-[11px]
                            [&_[cmdk-group-heading]]:font-semibold
-                           [&_[cmdk-group-heading]]:tracking-wider
+                           [&_[cmdk-group-heading]]:tracking-wide
                            [&_[cmdk-group-heading]]:uppercase
                            [&_[cmdk-group-heading]]:text-mac-tertiary-label"
               >
@@ -230,7 +230,7 @@ export function CommandPalette({
               className="[&_[cmdk-group-heading]]:px-4 [&_[cmdk-group-heading]]:py-2
                          [&_[cmdk-group-heading]]:text-[11px]
                          [&_[cmdk-group-heading]]:font-semibold
-                         [&_[cmdk-group-heading]]:tracking-wider
+                         [&_[cmdk-group-heading]]:tracking-wide
                          [&_[cmdk-group-heading]]:uppercase
                          [&_[cmdk-group-heading]]:text-mac-tertiary-label"
             >
@@ -276,7 +276,7 @@ export function CommandPalette({
               className="[&_[cmdk-group-heading]]:px-4 [&_[cmdk-group-heading]]:py-2
                          [&_[cmdk-group-heading]]:text-[11px]
                          [&_[cmdk-group-heading]]:font-semibold
-                         [&_[cmdk-group-heading]]:tracking-wider
+                         [&_[cmdk-group-heading]]:tracking-wide
                          [&_[cmdk-group-heading]]:uppercase
                          [&_[cmdk-group-heading]]:text-mac-tertiary-label"
             >
@@ -318,7 +318,7 @@ function SessionResult({
       className="flex items-center gap-3 px-4 h-[36px] rounded-lg mx-2
                  text-[13px] leading-4 text-mac-label
                  cursor-default transition-all duration-150
-                 data-[selected=true]:text-mac-accent"
+                 data-[selected=true]:text-mac-accent data-[selected=true]:bg-white/[0.06]"
       style={{
         background: "transparent",
       }}

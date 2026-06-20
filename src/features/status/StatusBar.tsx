@@ -47,7 +47,7 @@ export default function StatusBar() {
           </span>
         )}
         <span className="font-mono dark:text-mac-tertiary-label light:text-gray-400">
-          v{data?.version ?? "?"}
+          v{data?.version ?? "dev"}
         </span>
       </div>
     </footer>

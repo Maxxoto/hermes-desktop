@@ -192,7 +192,7 @@ export default function SessionItem({ session, isActive, onClick }: SessionItemP
         <button
           onClick={handleConfirmDelete}
           title="Confirm delete"
-          className="mac-btn mac-btn-destructive !h-5 px-2 text-[11px]"
+          className="mac-btn mac-btn-destructive !h-7 px-3 text-[11px]"
         >
           Delete
         </button>
@@ -261,14 +261,14 @@ export default function SessionItem({ session, isActive, onClick }: SessionItemP
         <button
           onClick={startEdit}
           title="Rename"
-          className="mac-icon-btn !w-5 !h-5 dark:text-mac-secondary-label dark:hover:text-mac-blue light:text-gray-500 light:hover:text-blue-600"
+          className="mac-icon-btn !w-6 !h-6 dark:text-mac-secondary-label dark:hover:text-mac-blue light:text-gray-500 light:hover:text-blue-600"
         >
           <Pencil className="w-3 h-3" />
         </button>
         <button
           onClick={handleDeleteClick}
           title="Delete"
-          className="mac-icon-btn !w-5 !h-5 dark:text-mac-secondary-label dark:hover:text-mac-red light:text-gray-500 light:hover:text-red-500"
+          className="mac-icon-btn !w-6 !h-6 dark:text-mac-secondary-label dark:hover:text-mac-red light:text-gray-500 light:hover:text-red-500"
         >
           <Trash2 className="w-3 h-3" />
         </button>
