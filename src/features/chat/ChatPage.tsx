@@ -25,6 +25,10 @@ import { buildMarkdown } from "./ExportButton";
 import { useLayoutStore } from "../layout/use-layout";
 import ResizeHandle from "../layout/ResizeHandle";
 import SplitView from "../layout/SplitView";
+import AgentSelector from "../agents/AgentSelector";
+import ModelPicker from "../agents/ModelPicker";
+import { useFileUpload } from "../files/use-file-upload";
+import DropZone from "../files/DropZone";
 
 export default function ChatPage() {
   const navigate = useNavigate();
@@ -74,6 +78,13 @@ export default function ChatPage() {
 
   // Command palette
   const [showCommandPalette, setShowCommandPalette] = useState(false);
+
+  // Agent / Model selection
+  const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
+  const [selectedModel, setSelectedModel] = useState<string | null>(null);
+
+  // File attachments
+  const { files, addFiles, removeFile, clearFiles } = useFileUpload();
 
   // Sessions for the command palette
   const { data: paletteSessions = [] } = useSessions();
@@ -145,6 +156,18 @@ export default function ChatPage() {
 
   const handleSend = useCallback(
     async (text: string) => {
+      // Append file names to message if files are attached
+      if (files.length > 0) {
+        const fileNames = files
+          .filter((f) => f.status !== "error")
+          .map((f) => f.file.name)
+          .join(", ");
+        if (fileNames) {
+          text = `${text}\n\n[Attached: ${fileNames}]`;
+        }
+        clearFiles();
+      }
+
       const ts = Date.now() / 1000;
 
       // add user message
@@ -231,7 +254,11 @@ export default function ChatPage() {
                 setStreaming(false);
                 break;
             }
-          }
+          },
+          {
+            agent: selectedAgent ?? undefined,
+            model: selectedModel ?? undefined,
+          },
         );
       } catch (err) {
         const store = useChatStore.getState();
@@ -254,6 +281,10 @@ export default function ChatPage() {
       setStreaming,
       autoTitle,
       notifyOnCompletion,
+      selectedAgent,
+      selectedModel,
+      files,
+      clearFiles,
     ]
   );
 
@@ -305,6 +336,17 @@ export default function ChatPage() {
     setStreaming(false);
   }, [setStreaming]);
 
+  const handleRetry = useCallback(() => {
+    // Find the last user message
+    const lastUserMsg = [...messages].reverse().find((m) => m.role === "user");
+    if (!lastUserMsg) return;
+    // Remove all messages after the last user message
+    const userMsgIndex = messages.findIndex((m) => m.id === lastUserMsg.id);
+    loadFromSession(messages.slice(0, userMsgIndex));
+    // Re-send
+    handleSend(lastUserMsg.content);
+  }, [messages, loadFromSession, handleSend]);
+
   const handleLogout = useCallback(async () => {
     useConnectionStore.getState().clear();
     try {
@@ -342,7 +384,8 @@ export default function ChatPage() {
 
   // ── Chat content (shared between single & split views) ───────────────────
   const chatMessages = (
-    <div className="flex-1 overflow-y-auto message-content px-2 sm:px-4 py-2 sm:py-4">
+    <DropZone onDrop={addFiles}>
+      <div className="flex-1 overflow-y-auto message-content px-2 sm:px-4 py-2 sm:py-4">
       <div className="max-w-3xl mx-auto">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full dark:text-mac-tertiary-label light:text-gray-400 min-h-[60vh]">
@@ -358,7 +401,7 @@ export default function ChatPage() {
           </div>
         )}
         {messages.map((msg) => (
-          <MessageBubble key={msg.id} message={msg} />
+          <MessageBubble key={msg.id} message={msg} onRetry={!isStreaming ? handleRetry : undefined} />
         ))}
         {/* Typing indicator when streaming with empty response */}
         {isStreaming && messages.length > 0 && messages[messages.length - 1]?.content === "" && (
@@ -370,7 +413,8 @@ export default function ChatPage() {
         )}
         <div ref={messagesEndRef} />
       </div>
-    </div>
+      </div>
+    </DropZone>
   );
 
   const chatInput = (
@@ -388,7 +432,13 @@ export default function ChatPage() {
         </div>
       )}
       <div className="flex-1">
-        <ChatInput onSend={handleSend} disabled={isStreaming} />
+        <ChatInput
+          onSend={handleSend}
+          disabled={isStreaming}
+          files={files}
+          onFiles={addFiles}
+          onRemoveFile={removeFile}
+        />
       </div>
     </div>
   );
@@ -421,6 +471,8 @@ export default function ChatPage() {
               <PanelLeftClose className="h-4 w-4" />
             )}
           </button>
+          <AgentSelector value={selectedAgent} onChange={setSelectedAgent} />
+          <ModelPicker value={selectedModel} onChange={setSelectedModel} />
           <MessageSquare className="h-4 w-4 dark:text-mac-blue light:text-blue-600 flex-shrink-0 hidden sm:block" />
           <span className="text-[13px] font-medium truncate">
             {sessionId

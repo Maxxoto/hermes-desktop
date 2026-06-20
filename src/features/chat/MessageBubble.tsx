@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, RotateCcw } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { type Message } from "./use-chat-store";
 import { ToolProgress } from "./ToolProgress";
@@ -9,9 +9,10 @@ import "../chat/markdown-styles.css";
 
 interface MessageBubbleProps {
   message: Message;
+  onRetry?: () => void;
 }
 
-export function MessageBubble({ message }: MessageBubbleProps) {
+export function MessageBubble({ message, onRetry }: MessageBubbleProps) {
   const isUser = message.role === "user";
   const [copied, setCopied] = useState(false);
 
@@ -75,6 +76,20 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
         </button>
       </div>
+
+      {/* Retry button — appears on hover for assistant messages */}
+      {!isUser && onRetry && (
+        <div className="flex items-center self-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-1">
+          <button
+            onClick={onRetry}
+            title="Regenerate response"
+            aria-label="Regenerate response"
+            className="mac-icon-btn !w-7 !h-7 dark:text-mac-tertiary-label light:text-gray-400 transition-all duration-150 active:scale-[0.92]"
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,14 +1,26 @@
 import { type KeyboardEvent, useRef } from "react";
-import { Send } from "lucide-react";
+import { Send, Paperclip } from "lucide-react";
 import { cn } from "../../lib/utils";
+import type { AttachedFile } from "../files/use-file-upload";
+import AttachmentChip from "../files/AttachmentChip";
 
 interface ChatInputProps {
   onSend: (text: string) => void;
   disabled?: boolean;
+  files?: AttachedFile[];
+  onFiles?: (files: FileList) => void;
+  onRemoveFile?: (id: string) => void;
 }
 
-export function ChatInput({ onSend, disabled }: ChatInputProps) {
+export function ChatInput({
+  onSend,
+  disabled,
+  files,
+  onFiles,
+  onRemoveFile,
+}: ChatInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSend = () => {
     const el = textareaRef.current;
@@ -35,9 +47,40 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
   };
 
   return (
-    <div className="glass-border-t px-5 py-4"
-      style={{ background: "var(--mac-toolbar)" }}>
+    <div
+      className="glass-border-t px-5 py-4"
+      style={{ background: "var(--mac-toolbar)" }}
+    >
+      {/* Attachment chips */}
+      {files && files.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 pb-2">
+          {files.map((f) => (
+            <AttachmentChip key={f.id} file={f} onRemove={onRemoveFile!} />
+          ))}
+        </div>
+      )}
       <div className="flex items-end gap-3 max-w-4xl mx-auto">
+        {/* File picker button */}
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          title="Attach files"
+          aria-label="Attach files"
+          className="flex-shrink-0 mac-icon-btn !w-8 !h-8 dark:text-mac-tertiary-label light:text-gray-400"
+          disabled={disabled}
+        >
+          <Paperclip className="h-4 w-4" />
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept="image/*,.pdf,.txt,.md,.json,.csv,.py,.js,.ts,.tsx,.go,.rs,.yaml,.yml,.toml"
+          className="hidden"
+          onChange={(e) => {
+            if (e.target.files) onFiles?.(e.target.files);
+            e.target.value = "";
+          }}
+        />
         <textarea
           ref={textareaRef}
           onInput={handleInput}
@@ -52,7 +95,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
             "dark:text-mac-label dark:placeholder:text-mac-tertiary-label",
             "light:text-black light:placeholder:text-gray-400",
             "focus:outline-none",
-            disabled && "opacity-50 cursor-not-allowed"
+            disabled && "opacity-50 cursor-not-allowed",
           )}
         />
         <button
@@ -67,7 +110,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
             "text-white",
             "transition-all duration-150",
             "active:scale-[0.92]",
-            "disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none"
+            "disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none",
           )}
         >
           <Send className="h-4 w-4" />
