@@ -1,14 +1,11 @@
 /**
  * CommandPalette.tsx — Cmd+K / Ctrl+K quick-launcher
- *
- * Full-screen overlay (backdrop blur) with a centered card. Three categories:
- * Sessions (fuzzy-matched via fuse.js), Actions, and Navigation.
- *
- * Uses `cmdk` primitives for keyboard navigation (arrows, Enter, Esc) and
- * accessibility. The built-in cmdk filter is disabled so we can run fuse.js
- * for sessions while keeping actions/navigation always-visible.
- *
- * All styling follows UI-UX-DESIGN-SPEC.md (macOS-native tokens, 13px body).
+ * 
+ * Glass design with Apple Liquid Glass patterns:
+ * - Layered gradient backgrounds
+ * - Subtle reflection overlays
+ * - Controlled blur intensity
+ * - Inset shadows for edge definition
  */
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { Command } from "cmdk";
@@ -25,18 +22,11 @@ import {
 } from "lucide-react";
 import type { Session } from "../connection/gateway-api";
 
-// ── Types ──────────────────────────────────────────────────────────────────
-
 export interface CommandPaletteProps {
-  /** Whether the palette overlay is visible. */
   open: boolean;
-  /** Called when the palette requests to close (Esc, backdrop click, selection). */
   onClose: () => void;
-  /** All known sessions from the gateway (for fuzzy search). */
   sessions: Session[];
-  /** The currently active session id (null = no session). */
   currentSessionId: string | null;
-  /** Action callbacks. */
   actions: {
     onNewSession: () => void;
     onToggleTheme: () => void;
@@ -49,9 +39,6 @@ export interface CommandPaletteProps {
   };
 }
 
-// ── Helpers ────────────────────────────────────────────────────────────────
-
-/** Relative-time formatter (e.g. "3m ago", "2h ago", "Jan 5"). */
 function formatLastActive(epochSec: number): string {
   const diff = Date.now() / 1000 - epochSec;
   if (diff < 60) return "just now";
@@ -63,8 +50,6 @@ function formatLastActive(epochSec: number): string {
   });
 }
 
-// ── Component ──────────────────────────────────────────────────────────────
-
 export function CommandPalette({
   open,
   onClose,
@@ -75,17 +60,12 @@ export function CommandPalette({
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Reset query every time the palette opens
   useEffect(() => {
-    if (open) {
-      setQuery("");
-    }
+    if (open) setQuery("");
   }, [open]);
 
-  // Auto-focus the search input on open
   useEffect(() => {
     if (open) {
-      // Defer to next tick so cmdk has mounted the input
       const id = requestAnimationFrame(() => {
         inputRef.current?.focus();
       });
@@ -93,7 +73,6 @@ export function CommandPalette({
     }
   }, [open]);
 
-  // Fuse.js instance for fuzzy session search
   const fuse = useMemo(
     () =>
       new Fuse(sessions, {
@@ -101,16 +80,13 @@ export function CommandPalette({
         threshold: 0.3,
         ignoreLocation: true,
       }),
-    [sessions],
+    [sessions]
   );
 
-  // Filtered sessions based on the current query
   const filteredSessions = useMemo(() => {
     if (!query.trim()) return sessions;
     return fuse.search(query).map((r) => r.item);
   }, [fuse, sessions, query]);
-
-  // ── Selection handlers ───────────────────────────────────────────────────
 
   const handleSelect = useCallback(
     (value: string) => {
@@ -143,10 +119,8 @@ export function CommandPalette({
       }
       onClose();
     },
-    [actions, onClose],
+    [actions, onClose]
   );
-
-  // ── Render ───────────────────────────────────────────────────────────────
 
   if (!open) return null;
 
@@ -155,7 +129,6 @@ export function CommandPalette({
       className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh]"
       data-testid="command-palette-overlay"
       onClick={(e) => {
-        // Close on backdrop click (click on the overlay itself, not its children)
         if (e.target === e.currentTarget) onClose();
       }}
       onKeyDown={(e) => {
@@ -166,60 +139,76 @@ export function CommandPalette({
         }
       }}
     >
-      {/* Backdrop */}
-      <div className="absolute inset-0 backdrop-blur-sm bg-black/40" />
+      {/* Backdrop — glass blur */}
+      <div className="absolute inset-0 backdrop-blur-md" 
+        style={{ background: "rgba(0, 0, 0, 0.5)" }} />
 
-      {/* Card — glass panel */}
+      {/* Card — glass surface with reflection */}
       <div
-        className="relative w-[90vw] max-w-[640px] max-h-[60vh] flex flex-col
-                   rounded-xl overflow-hidden
-                   glass-surface
-                   shadow-[0_24px_80px_rgba(0,0,0,0.6)]
-                   animate-cmdk-scale select-none"
+        className="relative w-[90vw] max-w-[560px] max-h-[50vh] flex flex-col
+                   rounded-2xl overflow-hidden
+                   animate-cmdk-scale"
+        style={{
+          background: "var(--glass-gradient-dark)",
+          backdropFilter: "blur(24px) saturate(200%)",
+          WebkitBackdropFilter: "blur(24px) saturate(200%)",
+          border: "1px solid var(--glass-border-color)",
+          boxShadow: `
+            0 24px 80px rgba(0, 0, 0, 0.5),
+            0 0 0 1px rgba(255, 255, 255, 0.03),
+            inset 0 1px 0 rgba(255, 255, 255, 0.06)
+          `,
+        }}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Reflection overlay */}
+        <div className="absolute inset-0 pointer-events-none rounded-2xl"
+          style={{ background: "var(--glass-reflection)", opacity: 0.3 }} />
+
         <Command
           shouldFilter={false}
           loop
           label="Command Palette"
-          className="flex flex-col"
+          className="flex flex-col relative"
         >
-          {/* Search input row */}
-          <div
-            className="flex items-center gap-2 px-3 glass-border-b"
-          >
-            <Search className="w-4 h-4 text-[var(--mac-tertiary-label)] flex-shrink-0" />
+          {/* Search input */}
+          <div className="flex items-center gap-3 px-4 py-3 glass-border-b">
+            <Search className="w-4 h-4 dark:text-mac-tertiary-label light:text-gray-400 flex-shrink-0" />
             <Command.Input
               ref={inputRef}
               value={query}
               onValueChange={setQuery}
               placeholder="Search sessions, actions..."
-              className="flex-1 h-[36px] bg-transparent border-none outline-none
-                         text-[13px] leading-4 text-[var(--mac-label)]
-                         placeholder:text-[var(--mac-tertiary-label)]
+              className="flex-1 h-[28px] bg-transparent border-none outline-none
+                         text-[14px] leading-4 dark:text-mac-label light:text-black
+                         placeholder:text-mac-tertiary-label
                          caret-[var(--mac-accent)]"
             />
+            <kbd className="text-[10px] dark:text-mac-tertiary-label light:text-gray-400 
+                           px-1.5 py-0.5 rounded"
+              style={{ background: "rgba(255, 255, 255, 0.06)" }}>
+              ESC
+            </kbd>
           </div>
 
-          {/* Results list */}
-          <Command.List className="flex-1 overflow-y-auto min-h-0 py-1">
-            {/* Empty state — shown when no items match at all */}
+          {/* Results */}
+          <Command.List className="flex-1 overflow-y-auto min-h-0 py-2">
             {filteredSessions.length === 0 && query.trim() && (
-              <div className="px-4 py-8 text-center text-[13px] text-[var(--mac-tertiary-label)]">
+              <div className="px-4 py-8 text-center text-[13px] text-mac-tertiary-label">
                 No results found
               </div>
             )}
 
-            {/* ── Sessions ─────────────────────────────────────────── */}
+            {/* Sessions */}
             {filteredSessions.length > 0 && (
               <Command.Group
                 heading="Sessions"
-                className="[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-1
+                className="[&_[cmdk-group-heading]]:px-4 [&_[cmdk-group-heading]]:py-2
                            [&_[cmdk-group-heading]]:text-[11px]
                            [&_[cmdk-group-heading]]:font-semibold
-                           [&_[cmdk-group-heading]]:tracking-wide
+                           [&_[cmdk-group-heading]]:tracking-wider
                            [&_[cmdk-group-heading]]:uppercase
-                           [&_[cmdk-group-heading]]:text-[var(--mac-tertiary-label)]"
+                           [&_[cmdk-group-heading]]:text-mac-tertiary-label"
               >
                 {filteredSessions.slice(0, 10).map((s) => (
                   <SessionResult
@@ -232,15 +221,15 @@ export function CommandPalette({
               </Command.Group>
             )}
 
-            {/* ── Actions ──────────────────────────────────────────── */}
+            {/* Actions */}
             <Command.Group
               heading="Actions"
-              className="[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-1
+              className="[&_[cmdk-group-heading]]:px-4 [&_[cmdk-group-heading]]:py-2
                          [&_[cmdk-group-heading]]:text-[11px]
                          [&_[cmdk-group-heading]]:font-semibold
-                         [&_[cmdk-group-heading]]:tracking-wide
+                         [&_[cmdk-group-heading]]:tracking-wider
                          [&_[cmdk-group-heading]]:uppercase
-                         [&_[cmdk-group-heading]]:text-[var(--mac-tertiary-label]]"
+                         [&_[cmdk-group-heading]]:text-mac-tertiary-label"
             >
               <ActionRow
                 value="new"
@@ -278,15 +267,15 @@ export function CommandPalette({
               />
             </Command.Group>
 
-            {/* ── Navigation ──────────────────────────────────────── */}
+            {/* Navigation */}
             <Command.Group
               heading="Navigation"
-              className="[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-1
+              className="[&_[cmdk-group-heading]]:px-4 [&_[cmdk-group-heading]]:py-2
                          [&_[cmdk-group-heading]]:text-[11px]
                          [&_[cmdk-group-heading]]:font-semibold
-                         [&_[cmdk-group-heading]]:tracking-wide
+                         [&_[cmdk-group-heading]]:tracking-wider
                          [&_[cmdk-group-heading]]:uppercase
-                         [&_[cmdk-group-heading]]:text-[var(--mac-tertiary-label)]"
+                         [&_[cmdk-group-heading]]:text-mac-tertiary-label"
             >
               <ActionRow
                 value="settings"
@@ -309,9 +298,6 @@ export function CommandPalette({
   );
 }
 
-// ── Sub-components ─────────────────────────────────────────────────────────
-
-/** A session result row with title, model, message count, last-active. */
 function SessionResult({
   session,
   isActive,
@@ -326,30 +312,33 @@ function SessionResult({
     <Command.Item
       value={`session:${session.id}`}
       onSelect={onSelect}
-      className="flex items-center gap-2.5 px-3 h-[32px] rounded-[4px] mx-1
-                 text-[13px] leading-4 text-[var(--mac-label)]
-                 cursor-default transition-colors
-                 data-[selected=true]:bg-[rgba(255,255,255,0.1)]
-                 data-[selected=true]:text-[var(--mac-accent)]"
+      className="flex items-center gap-3 px-4 h-[36px] rounded-lg mx-2
+                 text-[13px] leading-4 text-mac-label
+                 cursor-default transition-all duration-150
+                 data-[selected=true]:text-mac-accent"
+      style={{
+        background: "transparent",
+      }}
+      data-selected-style="true"
     >
-      <MessageSquare className="w-4 h-4 flex-shrink-0 opacity-60" />
+      <MessageSquare className="w-4 h-4 flex-shrink-0 opacity-50" />
       <div className="flex-1 min-w-0">
-        <div className="truncate font-normal">{title}</div>
+        <div className="truncate font-medium">{title}</div>
       </div>
-      <span className="flex-shrink-0 text-[10px] text-[var(--mac-tertiary-label)]">
+      <span className="flex-shrink-0 text-[10px] text-mac-tertiary-label">
         {session.message_count} msg
       </span>
-      <span className="flex-shrink-0 text-[10px] text-[var(--mac-tertiary-label)]">
+      <span className="flex-shrink-0 text-[10px] text-mac-tertiary-label">
         {formatLastActive(session.last_active)}
       </span>
       {isActive && (
-        <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-[var(--mac-accent)]" />
+        <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full glow-accent"
+          style={{ background: "var(--mac-accent)" }} />
       )}
     </Command.Item>
   );
 }
 
-/** An action/navigation result row with icon, label, optional shortcut. */
 function ActionRow({
   value,
   icon,
@@ -372,16 +361,15 @@ function ActionRow({
       value={value}
       onSelect={onSelect}
       disabled={disabled}
-      className={`flex items-center gap-2.5 px-3 h-[32px] rounded-[4px] mx-1
-                  text-[13px] leading-4 cursor-default transition-colors
-                  ${destructive ? "text-[var(--mac-red)]" : "text-[var(--mac-label)]"}
-                  data-[selected=true]:bg-[rgba(255,255,255,0.1)]
+      className={`flex items-center gap-3 px-4 h-[36px] rounded-lg mx-2
+                  text-[13px] leading-4 cursor-default transition-all duration-150
+                  ${destructive ? "text-mac-red" : "text-mac-label"}
                   aria-disabled:opacity-40`}
     >
-      <span className="flex-shrink-0 opacity-80">{icon}</span>
-      <span className="flex-1">{label}</span>
+      <span className="flex-shrink-0 opacity-60">{icon}</span>
+      <span className="flex-1 font-medium">{label}</span>
       {shortcut && (
-        <span className="flex-shrink-0 text-[10px] text-[var(--mac-tertiary-label)]">
+        <span className="flex-shrink-0 text-[10px] text-mac-tertiary-label">
           {shortcut}
         </span>
       )}
@@ -389,15 +377,6 @@ function ActionRow({
   );
 }
 
-// ── Keyboard shortcut hook ─────────────────────────────────────────────────
-
-/**
- * useCommandPaletteShortcut — registers a global Cmd+K / Ctrl+K listener
- * that toggles the palette open. Returns nothing; manages its own listener.
- *
- * Uses `(e.metaKey || e.ctrlKey) && e.key === 'k'` to support both macOS
- * and Linux/Windows. Tauri's `__TAURI__` presence indicates macOS native.
- */
 export function useCommandPaletteShortcut(onToggle: () => void) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {

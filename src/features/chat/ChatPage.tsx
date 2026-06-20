@@ -329,7 +329,8 @@ export default function ChatPage() {
   );
 
   return (
-    <div className="flex flex-1 min-h-0 dark:bg-mac-content light:bg-white dark:text-mac-label light:text-black overflow-hidden">
+    <div className="flex flex-1 min-h-0 dark:text-mac-label light:text-black overflow-hidden"
+      style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16162a 50%, #0f0f23 100%)' }}>
       {/* Sidebar — glass panel */}
       <aside className={`sidebar vibrancy-sidebar glass-border-r
         fixed inset-0 z-50 md:static md:z-auto

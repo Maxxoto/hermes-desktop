@@ -10,23 +10,23 @@ export default function StatusBar() {
     !isLoading && !isError && data !== undefined && isConnected(data.status);
 
   return (
-    <footer className="flex items-center justify-between glass-border-t vibrancy-statusbar px-5 text-[10px] dark:text-mac-tertiary-label light:text-gray-400"
-      style={{ height: "24px" }}>
+    <footer className="flex items-center justify-between vibrancy-statusbar px-5 text-[10px] dark:text-mac-tertiary-label light:text-gray-400"
+      style={{ height: "26px" }}>
       {/* Left — Connection indicator */}
       <div className="flex items-center gap-2">
         {isLoading ? (
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2 w-2 animate-pulse rounded-full dark:bg-mac-orange light:bg-orange-500" />
+            <span className="inline-block h-[6px] w-[6px] animate-pulse rounded-full dark:bg-mac-orange light:bg-orange-500" />
             Connecting…
           </span>
         ) : connected ? (
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2 w-2 animate-pulse rounded-full dark:bg-mac-green light:bg-green-500 shadow-[0_0_8px_rgba(50,215,75,0.5)]" />
+            <span className="inline-block h-[6px] w-[6px] rounded-full dark:bg-mac-green light:bg-green-500 glow-green" />
             Connected
           </span>
         ) : (
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2 w-2 animate-pulse rounded-full dark:bg-mac-red light:bg-red-500 shadow-[0_0_8px_rgba(255,69,58,0.5)]" />
+            <span className="inline-block h-[6px] w-[6px] animate-pulse rounded-full dark:bg-mac-red light:bg-red-500 glow-red" />
             {reconnectIn !== null ? (
               <span className="dark:text-mac-red light:text-red-500">
                 Connection lost — reconnecting in {reconnectIn}s.

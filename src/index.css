@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 /* ===========================================================================
- * Hermes Desktop — macOS Glass Design System (Tailwind v4 CSS config)
- * Apple HIG glassmorphism: frosted glass, vibrancy, translucent materials
+ * Hermes Desktop — Liquid Glass Design System
+ * Apple Liquid Glass / iOS 26 glassmorphism
  * =========================================================================== */
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -10,42 +10,46 @@
 
 /* ---- Color tokens -------------------------------------------------------- */
 @theme {
-  /* macOS glass materials */
-  --color-mac-window: #323232;
-  --color-mac-sidebar: rgba(44, 44, 46, 0.72);
-  --color-mac-content: #1e1e1e;
-  --color-mac-control: rgba(28, 28, 30, 0.8);
-  --color-mac-toolbar: rgba(58, 58, 60, 0.78);
-  --color-mac-surface: rgba(37, 37, 37, 0.9);
-  --color-mac-elevated: rgba(44, 44, 46, 0.85);
-  --color-mac-overlay: rgba(30, 30, 30, 0.92);
+  /* Glass materials — semi-transparent with visible blur */
+  --color-mac-window: #1a1a2e;
+  --color-mac-sidebar: rgba(30, 30, 50, 0.6);
+  --color-mac-content: #16162a;
+  --color-mac-control: rgba(40, 40, 60, 0.5);
+  --color-mac-toolbar: rgba(45, 45, 65, 0.65);
+  --color-mac-surface: rgba(50, 50, 70, 0.7);
+  --color-mac-elevated: rgba(60, 60, 80, 0.75);
+  --color-mac-overlay: rgba(20, 20, 35, 0.85);
 
-  /* Glass overlays */
-  --color-mac-glass-subtle: rgba(255, 255, 255, 0.03);
-  --color-mac-glass-light: rgba(255, 255, 255, 0.05);
-  --color-mac-glass-medium: rgba(255, 255, 255, 0.08);
-  --color-mac-glass-strong: rgba(255, 255, 255, 0.12);
+  /* Glass borders — visible thin strokes */
+  --color-mac-glass-border: rgba(255, 255, 255, 0.18);
+  --color-mac-glass-border-strong: rgba(255, 255, 255, 0.25);
+  --color-mac-glass-border-subtle: rgba(255, 255, 255, 0.1);
+
+  /* Glass inner glow — top edge highlight */
+  --color-mac-glass-glow: rgba(255, 255, 255, 0.12);
+  --color-mac-glass-glow-strong: rgba(255, 255, 255, 0.2);
 
   /* Text colors (dark mode) */
-  --color-mac-label: #ffffff;
-  --color-mac-secondary-label: rgba(235, 235, 245, 0.6);
-  --color-mac-tertiary-label: rgba(235, 235, 245, 0.3);
-  --color-mac-quaternary-label: rgba(235, 235, 245, 0.18);
+  --color-mac-label: #f0f0ff;
+  --color-mac-secondary-label: rgba(220, 220, 240, 0.7);
+  --color-mac-tertiary-label: rgba(220, 220, 240, 0.45);
+  --color-mac-quaternary-label: rgba(220, 220, 240, 0.25);
 
-  /* System accent */
-  --color-mac-accent: #0a84ff;
-  --color-mac-accent-hover: #409cff;
+  /* System accent — vibrant blue */
+  --color-mac-accent: #0A84FF;
+  --color-mac-accent-hover: #409CFF;
+  --color-mac-accent-glow: rgba(10, 132, 255, 0.4);
 
   /* Semantic colors */
-  --color-mac-blue: #0a84ff;
-  --color-mac-green: #32d74b;
-  --color-mac-red: #ff453a;
-  --color-mac-orange: #ff9f0a;
-  --color-mac-gray: #98989d;
+  --color-mac-blue: #0A84FF;
+  --color-mac-green: #30D158;
+  --color-mac-red: #FF453A;
+  --color-mac-orange: #FF9F0A;
+  --color-mac-gray: #98989D;
 
-  /* Separators (glass borders) */
-  --color-mac-separator: rgba(255, 255, 255, 0.08);
-  --color-mac-separator-strong: rgba(255, 255, 255, 0.12);
+  /* Separators */
+  --color-mac-separator: rgba(255, 255, 255, 0.12);
+  --color-mac-separator-strong: rgba(255, 255, 255, 0.2);
 
   /* Font family */
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
@@ -53,46 +57,42 @@
   --font-mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
-/* ---- CSS variables for light mode overrides ------------------------------ */
+/* ---- Light mode overrides ------------------------------------------------ */
 :root {
   color-scheme: dark;
-  --mac-window: #323232;
-  --mac-sidebar: rgba(44, 44, 46, 0.72);
-  --mac-content: #1e1e1e;
-  --mac-control: rgba(28, 28, 30, 0.8);
-  --mac-toolbar: rgba(58, 58, 60, 0.78);
-  --mac-surface: rgba(37, 37, 37, 0.9);
-  --mac-label: #ffffff;
-  --mac-secondary-label: rgba(235, 235, 245, 0.6);
-  --mac-tertiary-label: rgba(235, 235, 245, 0.3);
-  --mac-quaternary-label: rgba(235, 235, 245, 0.18);
-  --mac-accent: #0a84ff;
-  --mac-separator: rgba(255, 255, 255, 0.08);
-  --mac-glass-subtle: rgba(255, 255, 255, 0.03);
-  --mac-glass-light: rgba(255, 255, 255, 0.05);
-  --mac-glass-medium: rgba(255, 255, 255, 0.08);
+  --mac-window: #1a1a2e;
+  --mac-sidebar: rgba(30, 30, 50, 0.6);
+  --mac-content: #16162a;
+  --mac-control: rgba(40, 40, 60, 0.5);
+  --mac-toolbar: rgba(45, 45, 65, 0.65);
+  --mac-surface: rgba(50, 50, 70, 0.7);
+  --mac-label: #f0f0ff;
+  --mac-secondary-label: rgba(220, 220, 240, 0.7);
+  --mac-tertiary-label: rgba(220, 220, 240, 0.45);
+  --mac-accent: #0A84FF;
+  --mac-separator: rgba(255, 255, 255, 0.12);
+  --mac-glass-border: rgba(255, 255, 255, 0.18);
+  --mac-glass-glow: rgba(255, 255, 255, 0.12);
 }
 
 :root.light {
   color-scheme: light;
-  --mac-window: #ececec;
-  --mac-sidebar: rgba(245, 245, 247, 0.78);
+  --mac-window: #e8e8f0;
+  --mac-sidebar: rgba(240, 240, 248, 0.7);
   --mac-content: #ffffff;
-  --mac-control: rgba(255, 255, 255, 0.85);
-  --mac-toolbar: rgba(245, 245, 247, 0.82);
-  --mac-surface: rgba(255, 255, 255, 0.95);
-  --mac-label: #000000;
-  --mac-secondary-label: rgba(60, 60, 67, 0.6);
-  --mac-tertiary-label: rgba(60, 60, 67, 0.3);
-  --mac-quaternary-label: rgba(60, 60, 67, 0.18);
-  --mac-accent: #007aff;
+  --mac-control: rgba(255, 255, 255, 0.7);
+  --mac-toolbar: rgba(245, 245, 253, 0.75);
+  --mac-surface: rgba(255, 255, 255, 0.8);
+  --mac-label: #1a1a2e;
+  --mac-secondary-label: rgba(30, 30, 50, 0.7);
+  --mac-tertiary-label: rgba(30, 30, 50, 0.45);
+  --mac-accent: #007AFF;
   --mac-separator: rgba(0, 0, 0, 0.08);
-  --mac-glass-subtle: rgba(0, 0, 0, 0.02);
-  --mac-glass-light: rgba(0, 0, 0, 0.04);
-  --mac-glass-medium: rgba(0, 0, 0, 0.06);
+  --mac-glass-border: rgba(0, 0, 0, 0.1);
+  --mac-glass-glow: rgba(255, 255, 255, 0.5);
 }
 
-/* ---- Global element defaults --------------------------------------------- */
+/* ---- Global defaults ----------------------------------------------------- */
 html {
   font-family: var(--font-sans);
   font-size: 13px;
@@ -103,11 +103,11 @@ html {
 
 body {
   margin: 0;
-  background-color: var(--mac-window);
+  background: linear-gradient(135deg, #1a1a2e 0%, #16162a 50%, #0f0f23 100%);
   color: var(--mac-label);
   font-size: 13px;
   line-height: 16px;
-  -webkit-text-size-adjust: 100%;
+  min-height: 100vh;
 }
 
 /* ---- Cursor rules ------------------------------------------------------- */
@@ -126,164 +126,235 @@ input[type="email"], textarea, [contenteditable] { cursor: text; }
   -webkit-user-select: text;
 }
 
-/* ---- Scrollbar rules (glass style) -------------------------------------- */
+/* ---- Scrollbar rules ----------------------------------------------------- */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.35);
 }
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
-:root.light ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); }
-:root.light ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.25); }
-:root.light * { scrollbar-color: rgba(0, 0, 0, 0.15) transparent; }
 
-/* ---- Focus rules -------------------------------------------------------- */
+/* ---- Focus rules --------------------------------------------------------- */
 :focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(10, 132, 255, 0.4);
-  border-radius: 4px;
+  box-shadow: 0 0 0 2px rgba(10, 132, 255, 0.5);
+  border-radius: 6px;
 }
 
 /* =========================================================================
- * GLASS DESIGN CLASSES — Apple HIG Glassmorphism
+ * LIQUID GLASS COMPONENTS — Apple-inspired glassmorphism
  * ========================================================================= */
 
-/* ---- Vibrancy glass panels ---------------------------------------------- */
-.vibrancy-sidebar {
-  background: var(--mac-sidebar);
-  backdrop-filter: blur(40px) saturate(180%) brightness(1.05);
-  -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.05);
-}
-
-.vibrancy-toolbar {
-  background: var(--mac-toolbar);
-  backdrop-filter: blur(40px) saturate(180%) brightness(1.05);
-  -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.05);
-}
-
-/* Content area — subtle glass depth */
-.vibrancy-content {
-  background: var(--mac-content);
-  backdrop-filter: blur(20px) saturate(150%);
-  -webkit-backdrop-filter: blur(20px) saturate(150%);
-}
-
-/* Status bar — ultra-thin glass */
-.vibrancy-statusbar {
-  background: rgba(30, 30, 30, 0.65);
-  backdrop-filter: blur(30px) saturate(160%);
-  -webkit-backdrop-filter: blur(30px) saturate(160%);
-}
-
-/* Elevated surfaces (modals, cards) */
-.glass-surface {
+/* ---- Glass Panel Base (sidebar, toolbar, cards) -------------------------- */
+.glass-panel {
   background: var(--mac-surface);
-  backdrop-filter: blur(20px) saturate(150%);
-  -webkit-backdrop-filter: blur(20px) saturate(150%);
-  border: 1px solid var(--mac-separator);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid var(--mac-glass-border);
+  box-shadow:
+    inset 0 1px 0 0 var(--mac-glass-glow),
+    0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-/* Input fields — glass effect */
+/* ---- Sidebar — frosted glass panel -------------------------------------- */
+.vibrancy-sidebar {
+  background: linear-gradient(180deg, rgba(40, 40, 65, 0.7) 0%, rgba(30, 30, 50, 0.8) 100%);
+  backdrop-filter: blur(40px) saturate(200%) brightness(1.1);
+  -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(1.1);
+  border-right: 1px solid var(--mac-glass-border);
+  box-shadow:
+    inset 0 1px 0 0 var(--mac-glass-glow),
+    inset -1px 0 0 0 rgba(255, 255, 255, 0.05),
+    4px 0 24px rgba(0, 0, 0, 0.2);
+}
+
+/* ---- Toolbar — glass strip ---------------------------------------------- */
+.vibrancy-toolbar {
+  background: linear-gradient(180deg, rgba(50, 50, 75, 0.75) 0%, rgba(40, 40, 60, 0.8) 100%);
+  backdrop-filter: blur(40px) saturate(180%) brightness(1.05);
+  -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.05);
+  border-bottom: 1px solid var(--mac-glass-border);
+  box-shadow:
+    inset 0 1px 0 0 var(--mac-glass-glow),
+    0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* ---- Status Bar — thin glass strip -------------------------------------- */
+.vibrancy-statusbar {
+  background: rgba(25, 25, 40, 0.7);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border-top: 1px solid var(--mac-glass-border);
+  box-shadow: inset 0 1px 0 0 var(--mac-glass-glow);
+}
+
+/* ---- Content Area — subtle glass ---------------------------------------- */
+.vibrancy-content {
+  background: rgba(22, 22, 42, 0.6);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+}
+
+/* ---- Glass Card (modals, settings) -------------------------------------- */
+.glass-surface {
+  background: linear-gradient(135deg, rgba(50, 50, 75, 0.75) 0%, rgba(40, 40, 60, 0.85) 100%);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid var(--mac-glass-border);
+  box-shadow:
+    inset 0 1px 0 0 var(--mac-glass-glow),
+    inset 0 -1px 0 0 rgba(0, 0, 0, 0.1),
+    0 24px 80px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+/* ---- Glass Input Field -------------------------------------------------- */
 .glass-input {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 6px;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.15),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  transition: all 200ms cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+.glass-input:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
 }
 .glass-input:focus {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.1);
   border-color: var(--mac-accent);
-  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.2);
-}
-:root.light .glass-input {
-  background: rgba(0, 0, 0, 0.03);
-  border-color: rgba(0, 0, 0, 0.08);
-}
-:root.light .glass-input:focus {
-  background: rgba(0, 0, 0, 0.04);
-  border-color: var(--mac-accent);
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.15),
+    0 0 0 3px rgba(10, 132, 255, 0.3),
+    0 0 20px rgba(10, 132, 255, 0.15);
 }
 
-/* Button styles — macOS glass push button */
+/* Light mode glass input */
+:root.light .glass-input {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.06),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+}
+:root.light .glass-input:hover {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+:root.light .glass-input:focus {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: var(--mac-accent);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.06),
+    0 0 0 3px rgba(0, 122, 255, 0.25);
+}
+
+/* ---- Glass Button (secondary) ------------------------------------------- */
 .mac-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 24px;
-  padding: 0 14px;
+  height: 28px;
+  padding: 0 16px;
   font-size: 13px;
   font-weight: 500;
-  border-radius: 6px;
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   color: var(--mac-label);
   cursor: default;
-  transition: all 120ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 150ms cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 .mac-btn:hover {
   background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.2);
 }
 .mac-btn:active {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.05);
   transform: scale(0.98);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 .mac-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
 
-/* Primary button */
+/* Primary button — glass blue */
 .mac-btn-primary {
-  background: linear-gradient(180deg, rgba(10, 132, 255, 0.9) 0%, rgba(0, 100, 210, 0.9) 100%);
-  border-color: rgba(0, 0, 0, 0.2);
+  background: linear-gradient(180deg, rgba(10, 132, 255, 0.85) 0%, rgba(0, 100, 210, 0.9) 100%);
+  border-color: rgba(0, 0, 0, 0.25);
   color: #ffffff;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 0 rgba(0, 0, 0, 0.15),
+    0 4px 16px rgba(10, 132, 255, 0.3);
 }
 .mac-btn-primary:hover {
-  background: linear-gradient(180deg, rgba(64, 156, 255, 0.95) 0%, rgba(10, 120, 220, 0.95) 100%);
+  background: linear-gradient(180deg, rgba(64, 156, 255, 0.9) 0%, rgba(10, 120, 220, 0.95) 100%);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.25),
+    0 6px 20px rgba(10, 132, 255, 0.4);
 }
 .mac-btn-primary:active {
-  background: linear-gradient(180deg, rgba(0, 100, 210, 0.9) 0%, rgba(0, 80, 180, 0.9) 100%);
+  background: linear-gradient(180deg, rgba(0, 100, 210, 0.9) 0%, rgba(0, 80, 180, 0.95) 100%);
 }
 
 /* Destructive button */
 .mac-btn-destructive {
-  background: linear-gradient(180deg, rgba(255, 94, 87, 0.9) 0%, rgba(220, 60, 50, 0.9) 100%);
+  background: linear-gradient(180deg, rgba(255, 69, 58, 0.85) 0%, rgba(220, 50, 40, 0.9) 100%);
   color: #ffffff;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.15),
+    0 4px 12px rgba(255, 69, 58, 0.25);
 }
 
-/* Light mode button variants */
+/* Light mode buttons */
 :root.light .mac-btn {
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.6);
   border-color: rgba(0, 0, 0, 0.1);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.9),
+    0 2px 8px rgba(0, 0, 0, 0.08);
 }
 :root.light .mac-btn:hover {
-  background: rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.75);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 1),
+    0 4px 12px rgba(0, 0, 0, 0.1);
 }
-:root.light .mac-btn:active {
-  background: rgba(0, 0, 0, 0.04);
+:root.light .mac-btn-primary {
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.3),
+    0 4px 16px rgba(0, 122, 255, 0.25);
 }
 
-/* Toolbar icon button */
+/* ---- Toolbar Icon Button ------------------------------------------------ */
 .mac-icon-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
   background: transparent;
   border: none;
   color: var(--mac-secondary-label);
@@ -291,44 +362,51 @@ input[type="email"], textarea, [contenteditable] { cursor: text; }
   transition: all 120ms cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 .mac-icon-btn:hover {
-  background: var(--mac-glass-light);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--mac-label);
 }
 .mac-icon-btn:active {
-  background: var(--mac-glass-medium);
-  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.06);
+  transform: scale(0.92);
 }
 .mac-icon-btn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
   background: transparent;
 }
-:root.light .mac-icon-btn:hover { background: rgba(0, 0, 0, 0.05); }
-:root.light .mac-icon-btn:active { background: rgba(0, 0, 0, 0.08); }
+:root.light .mac-icon-btn:hover { background: rgba(0, 0, 0, 0.06); }
+:root.light .mac-icon-btn:active { background: rgba(0, 0, 0, 0.1); }
 
-/* ---- Command palette animation ------------------------------------------ */
+/* ---- Command Palette Animation ------------------------------------------ */
 @keyframes cmdk-scale {
-  from { opacity: 0; transform: scale(0.96) translateY(-4px); }
+  from { opacity: 0; transform: scale(0.96) translateY(-8px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
 .animate-cmdk-scale {
-  animation: cmdk-scale 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  animation: cmdk-scale 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ---- Glass border utility ----------------------------------------------- */
+/* ---- Glass Border Utilities --------------------------------------------- */
 .glass-border-b {
-  border-bottom: 1px solid var(--mac-separator);
+  border-bottom: 1px solid var(--mac-glass-border);
 }
 .glass-border-t {
-  border-top: 1px solid var(--mac-separator);
+  border-top: 1px solid var(--mac-glass-border);
 }
 .glass-border-r {
-  border-right: 1px solid var(--mac-separator);
+  border-right: 1px solid var(--mac-glass-border);
 }
 .glass-border {
-  border: 1px solid var(--mac-separator);
+  border: 1px solid var(--mac-glass-border);
 }
 
-/* ---- Subtle glow for active elements ------------------------------------ */
+/* ---- Glow Effects ------------------------------------------------------- */
 .glow-accent {
-  box-shadow: 0 0 12px rgba(10, 132, 255, 0.15);
+  box-shadow: 0 0 20px rgba(10, 132, 255, 0.25);
+}
+.glow-green {
+  box-shadow: 0 0 12px rgba(48, 209, 88, 0.5);
+}
+.glow-red {
+  box-shadow: 0 0 12px rgba(255, 69, 58, 0.5);
 }

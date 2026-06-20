@@ -5,10 +5,6 @@ import { useConnectionStore } from "./connection-store";
 import { useTestConnection } from "./use-gateway-connection";
 import { useWindowTitle } from "../../hooks/use-window-title";
 
-// ---------------------------------------------------------------------------
-// ConnectionConfigPage — /connection
-// ---------------------------------------------------------------------------
-
 export default function ConnectionConfigPage() {
   const navigate = useNavigate();
   const { gatewayUrl, apiKey, isConfigured, setCredentials } =
@@ -21,20 +17,16 @@ export default function ConnectionConfigPage() {
 
   const testMutation = useTestConnection();
 
-  // Redirect to chat if already configured
   useEffect(() => {
     if (isConfigured && gatewayUrl && apiKey) {
       navigate("/chat", { replace: true });
     }
   }, [isConfigured, gatewayUrl, apiKey, navigate]);
 
-  // Sync local form state when store changes (e.g. after load_credentials)
   useEffect(() => {
     setUrl(gatewayUrl);
     setKey(apiKey);
   }, [gatewayUrl, apiKey]);
-
-  // ---- handlers ----------------------------------------------------------
 
   const handleTestConnection = async () => {
     if (!url.trim() || !key.trim()) return;
@@ -45,7 +37,6 @@ export default function ConnectionConfigPage() {
     if (!url.trim() || !key.trim()) return;
     setCredentials(url.trim(), key.trim());
 
-    // Persist credentials — Tauri keychain or localStorage fallback
     try {
       const isTauri = typeof window !== "undefined" && "__TAURI__" in window;
       if (isTauri) {
@@ -65,14 +56,23 @@ export default function ConnectionConfigPage() {
     }
   };
 
-  // ---- render ------------------------------------------------------------
   return (
-    <div className="flex min-h-dvh items-center justify-center dark:bg-mac-window light:bg-[#ECECEC] px-4">
-      <div className="w-full max-w-md glass-surface rounded-xl p-8 shadow-2xl">
+    <div className="flex min-h-dvh items-center justify-center px-4"
+      style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16162a 50%, #0f0f23 100%)' }}>
+      <div className="w-full max-w-md glass-surface rounded-2xl p-10">
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-[17px] font-bold dark:text-mac-label light:text-black">Hermes Desktop</h1>
-          <p className="mt-1 text-[13px] dark:text-mac-secondary-label light:text-gray-600">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
+            style={{ 
+              background: "linear-gradient(135deg, var(--mac-accent) 0%, #0066cc 100%)",
+              boxShadow: "0 8px 24px rgba(41, 151, 255, 0.3)"
+            }}>
+            <span className="text-2xl font-bold text-white">H</span>
+          </div>
+          <h1 className="text-[20px] font-semibold dark:text-mac-label light:text-black">
+            Hermes Desktop
+          </h1>
+          <p className="mt-2 text-[13px] dark:text-mac-secondary-label light:text-gray-600">
             Connect to your Hermes Gateway
           </p>
         </div>
@@ -83,7 +83,7 @@ export default function ConnectionConfigPage() {
           <div>
             <label
               htmlFor="gateway-url"
-              className="mb-1.5 block text-[13px] font-semibold dark:text-mac-label light:text-black"
+              className="mb-2 block text-[12px] font-medium dark:text-mac-secondary-label light:text-gray-600 uppercase tracking-wide"
             >
               Gateway URL
             </label>
@@ -93,10 +93,9 @@ export default function ConnectionConfigPage() {
               placeholder="https://gateway.example.com"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              className="w-full glass-input px-3 py-1.5 outline-none text-[13px]
+              className="w-full glass-input px-4 py-2.5 text-[13px]
                 dark:text-mac-label dark:placeholder:text-mac-tertiary-label
-                light:text-black light:placeholder:text-gray-400
-                transition-all"
+                light:text-black light:placeholder:text-gray-400"
             />
           </div>
 
@@ -104,7 +103,7 @@ export default function ConnectionConfigPage() {
           <div>
             <label
               htmlFor="api-key"
-              className="mb-1.5 block text-[13px] font-semibold dark:text-mac-label light:text-black"
+              className="mb-2 block text-[12px] font-medium dark:text-mac-secondary-label light:text-gray-600 uppercase tracking-wide"
             >
               API Key
             </label>
@@ -114,36 +113,42 @@ export default function ConnectionConfigPage() {
               placeholder="sk-..."
               value={key}
               onChange={(e) => setKey(e.target.value)}
-              className="w-full glass-input px-3 py-1.5 outline-none text-[13px]
+              className="w-full glass-input px-4 py-2.5 text-[13px]
                 dark:text-mac-label dark:placeholder:text-mac-tertiary-label
-                light:text-black light:placeholder:text-gray-400
-                transition-all"
+                light:text-black light:placeholder:text-gray-400"
             />
           </div>
 
-          {/* Test connection feedback */}
+          {/* Feedback */}
           {testMutation.isPending && (
-            <p className="text-[13px] dark:text-mac-secondary-label light:text-gray-600">Testing connection…</p>
+            <p className="text-[13px] dark:text-mac-secondary-label light:text-gray-600">
+              Testing connection…
+            </p>
           )}
 
           {testMutation.isError && (
-            <p className="text-[13px] dark:text-mac-red light:text-red-500">
-              Connection failed:{" "}
-              {testMutation.error instanceof Error
-                ? testMutation.error.message
-                : "Unknown error"}
-            </p>
+            <div className="p-3 rounded-lg text-[13px]"
+              style={{ background: "rgba(255, 69, 58, 0.1)", border: "1px solid rgba(255, 69, 58, 0.2)" }}>
+              <p className="dark:text-mac-red light:text-red-500">
+                Connection failed:{" "}
+                {testMutation.error instanceof Error
+                  ? testMutation.error.message
+                  : "Unknown error"}
+              </p>
+            </div>
           )}
 
           {testMutation.isSuccess && (
-            <p className="text-[13px] dark:text-mac-green light:text-green-600">
-              Connected! Gateway status:{" "}
-              <span className="font-semibold">{testMutation.data.status}</span>
-            </p>
+            <div className="p-3 rounded-lg text-[13px]"
+              style={{ background: "rgba(48, 209, 88, 0.1)", border: "1px solid rgba(48, 209, 88, 0.2)" }}>
+              <p className="dark:text-mac-green light:text-green-600">
+                Connected! Status: <span className="font-semibold">{testMutation.data.status}</span>
+              </p>
+            </div>
           )}
 
           {/* Buttons */}
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-3 pt-3">
             <button
               type="button"
               onClick={handleTestConnection}

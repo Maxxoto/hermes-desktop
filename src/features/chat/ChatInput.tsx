@@ -35,8 +35,9 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
   };
 
   return (
-    <div className="glass-border-t dark:bg-mac-content/80 light:bg-white/80 backdrop-blur-xl px-5 py-3">
-      <div className="flex items-end gap-2 max-w-4xl mx-auto">
+    <div className="glass-border-t px-5 py-4"
+      style={{ background: "var(--mac-toolbar)" }}>
+      <div className="flex items-end gap-3 max-w-4xl mx-auto">
         <textarea
           ref={textareaRef}
           onInput={handleInput}
@@ -45,13 +46,12 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           placeholder="Type a message…"
           rows={1}
           className={cn(
-            "flex-1 resize-none rounded-xl px-3.5 py-2.5",
-            "text-[13px] leading-4 min-h-[44px]",
+            "flex-1 resize-none rounded-xl px-4 py-3",
+            "text-[13px] leading-5 min-h-[44px]",
             "glass-input",
             "dark:text-mac-label dark:placeholder:text-mac-tertiary-label",
             "light:text-black light:placeholder:text-gray-400",
             "focus:outline-none",
-            "transition-all",
             disabled && "opacity-50 cursor-not-allowed"
           )}
         />
@@ -61,11 +61,10 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           title="Send"
           className={cn(
             "flex-shrink-0 flex items-center justify-center",
-            "w-8 h-8 rounded-full transition-all",
-            "bg-[var(--mac-accent)] text-white shadow-lg shadow-blue-500/20",
-            "hover:bg-[var(--mac-accent-hover)] hover:shadow-blue-500/30",
-            "active:scale-95",
-            "disabled:opacity-30 disabled:cursor-not-allowed"
+            "w-9 h-9 rounded-full",
+            "send-btn-glass",
+            "text-white",
+            "disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none"
           )}
         >
           <Send className="h-4 w-4" />
