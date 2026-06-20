@@ -42,7 +42,7 @@ describe("useAgents", () => {
     vi.restoreAllMocks();
   });
 
-  it("returns agents from API", async () => {
+  it("returns agents from API after fetch", async () => {
     mockListAgents.mockResolvedValue([
       { id: "a1", name: "Agent One", description: "First agent" },
       { id: "a2", name: "Agent Two", description: "Second agent" },
@@ -52,14 +52,16 @@ describe("useAgents", () => {
       wrapper: createWrapper(),
     });
 
-    expect(result.current.isLoading).toBe(true);
+    // Initially has placeholder data
+    expect(result.current.data).toBeDefined();
 
+    // After API resolves, data should be updated
     await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true);
+      expect(result.current.data).toHaveLength(2);
     });
 
-    expect(result.current.data).toHaveLength(2);
     expect(result.current.data![0].id).toBe("a1");
+    expect(result.current.data![1].id).toBe("a2");
   });
 
   it("falls back to default on 404", async () => {
@@ -79,13 +81,16 @@ describe("useAgents", () => {
     expect(result.current.data![0].id).toBe("default");
   });
 
-  it("reports loading state initially", () => {
+  it("has placeholder data available immediately", () => {
     mockListAgents.mockReturnValue(new Promise(() => {})); // never resolves
 
     const { result } = renderHook(() => useAgents(), {
       wrapper: createWrapper(),
     });
 
-    expect(result.current.isLoading).toBe(true);
+    // With placeholderData, data is available even while loading
+    expect(result.current.data).toBeDefined();
+    expect(result.current.data).toHaveLength(1);
+    expect(result.current.data![0].id).toBe("default");
   });
 });

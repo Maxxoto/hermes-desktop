@@ -52,11 +52,13 @@ describe("useModels", () => {
       wrapper: createWrapper(),
     });
 
+    // With placeholderData, data is available immediately (default)
+    expect(result.current.data).toBeDefined();
+
     await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true);
+      expect(result.current.data).toHaveLength(2);
     });
 
-    expect(result.current.data).toHaveLength(2);
     expect(result.current.data![0].provider).toBe("openai");
   });
 

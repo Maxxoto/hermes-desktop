@@ -186,13 +186,14 @@ describe("AgentSelector", () => {
     });
   });
 
-  it("shows loading state", () => {
+  it("shows default agent when API is slow", () => {
     mockListAgents.mockReturnValue(new Promise(() => {})); // never resolves
 
     render(<AgentSelector value={null} onChange={vi.fn()} />, {
       wrapper: createWrapper(),
     });
 
-    expect(screen.getByText("Loading…")).toBeInTheDocument();
+    // With placeholderData, shows default agent immediately
+    expect(screen.getByText("Default Agent")).toBeInTheDocument();
   });
 });
