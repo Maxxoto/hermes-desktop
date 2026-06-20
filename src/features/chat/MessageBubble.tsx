@@ -32,27 +32,27 @@ export function MessageBubble({ message }: MessageBubbleProps) {
         isUser ? "justify-end" : "justify-start"
       )}
     >
-      <div
-        className={cn(
-          "max-w-[80%] rounded-2xl px-4 py-2.5 break-words",
-          isUser
-            ? "bg-blue-600 text-white rounded-br-md whitespace-pre-wrap"
-            : "bg-gray-800 text-gray-100 rounded-bl-md border border-gray-700/50"
-        )}
-      >
-        {isUser ? (
-          <p className="text-sm leading-relaxed">{message.content}</p>
-        ) : (
-          <div className="markdown-prose text-sm leading-relaxed">
+      {isUser ? (
+        // User message — right-aligned, subtle background, 12px radius
+        <div className="message-content max-w-[80%] rounded-xl px-3.5 py-2.5 break-words
+          dark:bg-white/5 light:bg-black/5 whitespace-pre-wrap
+          text-[13px] leading-4 dark:text-mac-label light:text-black">
+          <p>{message.content}</p>
+        </div>
+      ) : (
+        // Assistant message — left-aligned, NO background
+        <div className="message-content max-w-[80%] py-2.5 px-0 break-words
+          text-[13px] leading-4 dark:text-mac-label light:text-black">
+          <div className="markdown-prose">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {message.content}
             </ReactMarkdown>
           </div>
-        )}
-        {!isUser && message.toolCalls && message.toolCalls.length > 0 && (
-          <ToolProgress toolCalls={message.toolCalls} />
-        )}
-      </div>
+          {message.toolCalls && message.toolCalls.length > 0 && (
+            <ToolProgress toolCalls={message.toolCalls} />
+          )}
+        </div>
+      )}
 
       {/* Copy button — appears on hover */}
       <div
@@ -65,17 +65,14 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           onClick={handleCopy}
           title={copied ? "Copied!" : "Copy message"}
           className={cn(
-            "p-1.5 rounded-lg transition-colors cursor-pointer",
+            "mac-icon-btn !w-7 !h-7",
             copied
-              ? "text-green-400 hover:text-green-300"
-              : "text-gray-500 hover:text-gray-300 hover:bg-gray-800"
+              ? "dark:text-mac-green light:text-green-600"
+              : "dark:text-mac-tertiary-label light:text-gray-400"
           )}
         >
           {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
         </button>
-        {copied && (
-          <span className="ml-0.5 text-xs text-green-400 font-medium">Copied!</span>
-        )}
       </div>
     </div>
   );

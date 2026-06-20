@@ -14,13 +14,13 @@ export function ToolProgress({ toolCalls }: ToolProgressProps) {
         <span
           key={`${tc.tool}-${i}`}
           className={cn(
-            "inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium transition-colors",
+            "inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-[11px] font-medium transition-colors border",
             tc.status === "running" &&
-              "bg-blue-500/20 text-blue-300 border border-blue-500/30",
+              "dark:bg-mac-blue/20 dark:text-mac-blue dark:border-mac-blue/30 light:bg-blue-500/15 light:text-blue-600 light:border-blue-500/30",
             tc.status === "completed" &&
-              "bg-green-500/20 text-green-300 border border-green-500/30",
+              "dark:bg-mac-green/20 dark:text-mac-green dark:border-mac-green/30 light:bg-green-500/15 light:text-green-600 light:border-green-500/30",
             tc.status === "failed" &&
-              "bg-red-500/20 text-red-300 border border-red-500/30"
+              "dark:bg-mac-red/20 dark:text-mac-red dark:border-mac-red/30 light:bg-red-500/15 light:text-red-600 light:border-red-500/30"
           )}
         >
           {tc.status === "running" && (

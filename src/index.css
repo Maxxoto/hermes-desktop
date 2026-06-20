@@ -1,34 +1,293 @@
 @import "tailwindcss";
 
+/* ===========================================================================
+ * Hermes Desktop — macOS-Native UI Theme (Tailwind v4 CSS config)
+ * Single source of truth: UI-UX-DESIGN-SPEC.md
+ * =========================================================================== */
+
 /* Enable class-based dark mode (Tailwind v4) — `dark:` variants apply
    when <html> has the `dark` class. Default theme is dark. */
 @custom-variant dark (&:where(.dark, .dark *));
+@custom-variant light (&:where(.light, .light *));
 
-/* Ensure dark class is present by default on first paint */
+/* ---- Color tokens -------------------------------------------------------- */
+/* Dark mode is the primary theme; light mode tokens applied via `.light` scope. */
+
+@theme {
+  /* macOS structural colors */
+  --color-mac-window: #323232;
+  --color-mac-sidebar: rgba(44, 44, 46, 0.85);
+  --color-mac-content: #1e1e1e;
+  --color-mac-control: #1c1c1e;
+  --color-mac-toolbar: #3a3a3c;
+  --color-mac-surface: #252525;
+
+  /* macOS text colors (dark mode) */
+  --color-mac-label: #ffffff;
+  --color-mac-secondary-label: rgba(235, 235, 245, 0.6);
+  --color-mac-tertiary-label: rgba(235, 235, 245, 0.3);
+  --color-mac-quaternary-label: rgba(235, 235, 245, 0.2);
+
+  /* System accent */
+  --color-mac-accent: #0a84ff;       /* systemBlue dark */
+  --color-mac-accent-light: #007aff;  /* systemBlue light */
+
+  /* Semantic colors */
+  --color-mac-blue: #0a84ff;
+  --color-mac-green: #32d74b;
+  --color-mac-red: #ff453a;
+  --color-mac-orange: #ff9f0a;
+  --color-mac-gray: #98989d;
+
+  /* Separators (dark mode) */
+  --color-mac-separator: rgba(84, 84, 88, 0.6);
+  --color-mac-opaque-separator: #38383a;
+
+  /* Font family — SF Pro stack */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+    system-ui, sans-serif;
+  --font-mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* ---- CSS variables for light-mode overrides ------------------------------ */
 :root {
   color-scheme: dark;
-}
-:root:not(.light) {
-  color-scheme: dark;
-}
-:root.light {
-  color-scheme: light;
+  --mac-window: #323232;
+  --mac-sidebar: rgba(44, 44, 46, 0.85);
+  --mac-content: #1e1e1e;
+  --mac-control: #1c1c1e;
+  --mac-toolbar: #3a3a3c;
+  --mac-surface: #252525;
+  --mac-label: #ffffff;
+  --mac-secondary-label: rgba(235, 235, 245, 0.6);
+  --mac-tertiary-label: rgba(235, 235, 245, 0.3);
+  --mac-quaternary-label: rgba(235, 235, 245, 0.2);
+  --mac-accent: #0a84ff;
+  --mac-separator: rgba(84, 84, 88, 0.6);
+  --mac-opaque-separator: #38383a;
 }
 
-/* Subtle scrollbar styling for dark theme */
+:root.light {
+  color-scheme: light;
+  --mac-window: #ececec;
+  --mac-sidebar: rgba(245, 245, 247, 0.85);
+  --mac-content: #ffffff;
+  --mac-control: #ffffff;
+  --mac-toolbar: rgba(245, 245, 247, 0.9);
+  --mac-surface: #f2f2f7;
+  --mac-label: #000000;
+  --mac-secondary-label: rgba(60, 60, 67, 0.6);
+  --mac-tertiary-label: rgba(60, 60, 67, 0.3);
+  --mac-quaternary-label: rgba(60, 60, 67, 0.18);
+  --mac-accent: #007aff;
+  --mac-separator: rgba(60, 60, 67, 0.3);
+  --mac-opaque-separator: #c6c6c8;
+}
+
+/* ---- Global element defaults --------------------------------------------- */
+html {
+  font-family: var(--font-sans);
+  font-size: 13px;            /* macOS body size — NOT 16px */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  background-color: var(--mac-window);
+  color: var(--mac-label);
+  font-size: 13px;
+  line-height: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ---- Cursor rules (spec §6) --------------------------------------------- */
+/* Default cursor for ALL elements; pointer only on actual links. */
+* {
+  cursor: default;
+}
+
+a,
+[role="link"] {
+  cursor: pointer;
+}
+
+/* Text cursor for editable text */
+input[type="text"],
+input[type="search"],
+input[type="url"],
+input[type="password"],
+input[type="email"],
+textarea,
+[contenteditable] {
+  cursor: text;
+}
+
+/* ---- Text selection rules (spec §6) ------------------------------------- */
+/* NO selection on UI chrome */
+.sidebar,
+.toolbar,
+button,
+label,
+nav,
+header,
+aside,
+footer,
+.no-select,
+select,
+summary {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* YES selection on content */
+.message-content,
+.code-block,
+.selectable,
+.markdown-prose,
+textarea,
+input {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* ---- Scrollbar rules (spec §6) ------------------------------------------ */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #374151;
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #4b5563;
+  background: rgba(255, 255, 255, 0.3);
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
 
-/* Allow text selection in chat, prevent on UI chrome */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+/* Light-mode scrollbar thumb */
+:root.light ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+}
+:root.light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.35);
+}
+:root.light * {
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+/* ---- Focus rules (spec §6) ---------------------------------------------- */
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25);
+  border-radius: 4px;
+}
+
+/* ---- Vibrancy classes (spec §6) ----------------------------------------- */
+.vibrancy-sidebar {
+  background: var(--mac-sidebar);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+.vibrancy-toolbar {
+  background: var(--mac-toolbar);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* ---- macOS button styles (spec §5) -------------------------------------- */
+.mac-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+  padding: 0 16px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #4d4d4d 0%, #3d3d3d 100%);
+  border: 0.5px solid rgba(0, 0, 0, 0.25);
+  color: var(--mac-label);
+  cursor: default;
+  transition: background 100ms cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.mac-btn:active {
+  background: linear-gradient(180deg, #3d3d3d 0%, #333333 100%);
+}
+
+.mac-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Primary button */
+.mac-btn-primary {
+  background: linear-gradient(180deg, #1a8cff 0%, #0a70e0 100%);
+  border-color: rgba(0, 0, 0, 0.2);
+  color: #ffffff;
+}
+
+.mac-btn-primary:active {
+  background: linear-gradient(180deg, #0a70e0 0%, #0860c4 100%);
+}
+
+/* Destructive button */
+.mac-btn-destructive {
+  background: linear-gradient(180deg, #ff5e57 0%, #e0443d 100%);
+  color: #ffffff;
+}
+
+.mac-btn-destructive:active {
+  background: linear-gradient(180deg, #e0443d 0%, #c03a34 100%);
+}
+
+/* ---- Toolbar icon button (spec §5) -------------------------------------- */
+.mac-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: var(--mac-secondary-label);
+  cursor: default;
+  transition: background 100ms cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.mac-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.mac-icon-btn:active {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.mac-icon-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  background: transparent;
+}
+
+/* Light-mode hover variants */
+:root.light .mac-icon-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+:root.light .mac-icon-btn:active {
+  background: rgba(0, 0, 0, 0.1);
+}

@@ -164,7 +164,9 @@ describe("ConnectionConfigPage", () => {
     expect(state.isConfigured).toBe(true);
   });
 
-  it("calls invoke store_credentials on save", async () => {
+  it("calls invoke store_credentials on save (Tauri mode)", async () => {
+    // Simulate Tauri environment so isTauri() returns true
+    (window as any).__TAURI__ = {};
     const user = userEvent.setup();
     renderPage();
 
@@ -176,6 +178,7 @@ describe("ConnectionConfigPage", () => {
       url: "http://gw:8642",
       apiKey: "secret-key",
     });
+    delete (window as any).__TAURI__;
   });
 
   it("trims whitespace on save", async () => {
