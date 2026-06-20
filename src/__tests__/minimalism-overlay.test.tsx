@@ -11,6 +11,7 @@ import { StatusIndicator } from "../features/minimalism/StatusIndicator";
 import { VoiceButton } from "../features/minimalism/VoiceButton";
 import CompactChat from "../features/minimalism/CompactChat";
 import { useOverlayMode, useOverlayWindow } from "../features/minimalism/use-overlay-window";
+import SettingsPage from "../features/minimalism/SettingsPage";
 import { renderHook, act } from "@testing-library/react";
 
 // ---------------------------------------------------------------------------
@@ -610,5 +611,490 @@ describe("useTTS hook", () => {
         }),
       }),
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Settings page tests
+// ---------------------------------------------------------------------------
+
+describe("SettingsPage", () => {
+  beforeEach(async () => {
+    localStorageMock.clear();
+    vi.clearAllMocks();
+    // Reset zustand store to defaults between tests
+    const { useSettings } = await import("../features/minimalism/use-settings");
+    useSettings.setState({
+      sttModel: "Xenova/whisper-base",
+      sttLanguage: "en",
+      sttAutoLoad: false,
+      downloadedModels: [],
+      ttsProvider: "resemble",
+      resembleApiKey: "",
+      resembleVoiceUuid: "61fcb769",
+      ttsSpeed: 1.0,
+      ttsAutoSpeak: true,
+      vadSensitivity: 50,
+      vadSilenceThreshold: 500,
+      overlayShortcut: "Cmd+Shift+Space",
+      overlayAlwaysOnTop: true,
+      overlayAutoHide: false,
+      overlayOpacity: 100,
+      defaultMode: "type",
+      theme: "dark",
+    });
+  });
+
+  it("renders settings page", () => {
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    expect(screen.getByTestId("settings-page")).toBeInTheDocument();
+  });
+
+  it("renders back button", () => {
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    expect(screen.getByRole("button", { name: "Back to chat" })).toBeInTheDocument();
+  });
+
+  it("calls onBack when back button is clicked", async () => {
+    const user = userEvent.setup();
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    await user.click(screen.getByRole("button", { name: "Back to chat" }));
+    expect(onBack).toHaveBeenCalled();
+  });
+
+  it("renders all four section cards", () => {
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    expect(screen.getByTestId("section-speech-to-text")).toBeInTheDocument();
+    expect(screen.getByTestId("section-text-to-speech")).toBeInTheDocument();
+    expect(screen.getByTestId("section-voice-activity-detection")).toBeInTheDocument();
+    expect(screen.getByTestId("section-overlay")).toBeInTheDocument();
+  });
+
+  it("renders STT model selector with default value", () => {
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    const selects = screen.getAllByRole("combobox");
+    expect(selects[0]).toHaveValue("Xenova/whisper-base");
+  });
+
+  it("renders STT language selector with default value", () => {
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    const selects = screen.getAllByRole("combobox");
+    expect(selects[1]).toHaveValue("en");
+  });
+
+  it("renders test recording button", () => {
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    expect(screen.getByRole("button", { name: "Test Recording" })).toBeInTheDocument();
+  });
+
+  it("renders auto-load model toggle", () => {
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    const toggle = screen.getByRole("switch", { name: "Auto-load model on startup" });
+    expect(toggle).toHaveAttribute("aria-checked", "false");
+  });
+
+  it("renders TTS provider selector", () => {
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    const selects = screen.getAllByRole("combobox");
+    const ttsSelect = selects.find(
+      (s) => (s as HTMLSelectElement).value === "resemble",
+    );
+    expect(ttsSelect).toBeDefined();
+  });
+
+  it("renders API key input", () => {
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    expect(screen.getByLabelText("Resemble AI API key")).toBeInTheDocument();
+  });
+
+  it("renders preview button", () => {
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    expect(screen.getByRole("button", { name: "Preview TTS voice" })).toBeInTheDocument();
+  });
+
+  it("toggles API key visibility", async () => {
+    const user = userEvent.setup();
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    const toggleBtn = screen.getByRole("button", { name: "Show API key" });
+    await user.click(toggleBtn);
+    expect(screen.getByRole("button", { name: "Hide API key" })).toBeInTheDocument();
+  });
+
+  it("renders VAD sensitivity slider", () => {
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    const sliders = screen.getAllByRole("slider");
+    expect(sliders.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("renders silence threshold selector with 500ms default", () => {
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    const selects = screen.getAllByRole("combobox");
+    const thresholdSelect = selects.find(
+      (s) => (s as HTMLSelectElement).value === "500",
+    );
+    expect(thresholdSelect).toBeDefined();
+  });
+
+  it("renders overlay shortcut input", () => {
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    expect(screen.getByLabelText("Global keyboard shortcut")).toBeInTheDocument();
+  });
+
+  it("renders always on top toggle defaulting to true", () => {
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    const alwaysOnTop = screen.getByRole("switch", { name: "Always on top" });
+    expect(alwaysOnTop).toHaveAttribute("aria-checked", "true");
+  });
+
+  it("renders auto-hide toggle defaulting to false", () => {
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    const autoHide = screen.getByRole("switch", { name: "Auto-hide after response" });
+    expect(autoHide).toHaveAttribute("aria-checked", "false");
+  });
+
+  it("renders theme selector with dark default", () => {
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    const selects = screen.getAllByRole("combobox");
+    const themeSelect = selects.find(
+      (s) => (s as HTMLSelectElement).value === "dark",
+    );
+    expect(themeSelect).toBeDefined();
+  });
+
+  it("renders default mode selector with type default", () => {
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    const selects = screen.getAllByRole("combobox");
+    const modeSelect = selects.find(
+      (s) => (s as HTMLSelectElement).value === "type",
+    );
+    expect(modeSelect).toBeDefined();
+  });
+
+  it("toggles auto-load model on click", async () => {
+    const user = userEvent.setup();
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    const toggle = screen.getByRole("switch", { name: "Auto-load model on startup" });
+    expect(toggle).toHaveAttribute("aria-checked", "false");
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute("aria-checked", "true");
+  });
+
+  it("toggles auto-speak on click", async () => {
+    const user = userEvent.setup();
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    const toggle = screen.getByRole("switch", { name: "Auto-speak responses" });
+    expect(toggle).toHaveAttribute("aria-checked", "true");
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute("aria-checked", "false");
+  });
+
+  it("changes STT model via selector", async () => {
+    const user = userEvent.setup();
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    const select = screen.getAllByRole("combobox")[0];
+    await user.selectOptions(select, "Xenova/whisper-small");
+    expect(select).toHaveValue("Xenova/whisper-small");
+  });
+
+  it("changes language via selector", async () => {
+    const user = userEvent.setup();
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    const selects = screen.getAllByRole("combobox");
+    const langSelect = selects[1];
+    await user.selectOptions(langSelect, "zh");
+    expect(langSelect).toHaveValue("zh");
+  });
+
+  it("shows model size and speed info for default model", () => {
+    const onBack = vi.fn();
+    render(<SettingsPage onBack={onBack} />);
+    expect(screen.getByText("144 MB")).toBeInTheDocument();
+    expect(screen.getByText("Speed: Fast")).toBeInTheDocument();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// useSettings hook tests
+// ---------------------------------------------------------------------------
+
+describe("useSettings store", () => {
+  beforeEach(async () => {
+    localStorageMock.clear();
+    // Reset zustand store to defaults between tests
+    const { useSettings } = await import("../features/minimalism/use-settings");
+    useSettings.setState({
+      sttModel: "Xenova/whisper-base",
+      sttLanguage: "en",
+      sttAutoLoad: false,
+      downloadedModels: [],
+      ttsProvider: "resemble",
+      resembleApiKey: "",
+      resembleVoiceUuid: "61fcb769",
+      ttsSpeed: 1.0,
+      ttsAutoSpeak: true,
+      vadSensitivity: 50,
+      vadSilenceThreshold: 500,
+      overlayShortcut: "Cmd+Shift+Space",
+      overlayAlwaysOnTop: true,
+      overlayAutoHide: false,
+      overlayOpacity: 100,
+      defaultMode: "type",
+      theme: "dark",
+    });
+  });
+
+  it("has correct defaults", async () => {
+    const { useSettings } = await import("../features/minimalism/use-settings");
+    const { result } = renderHook(() => useSettings());
+    expect(result.current.sttModel).toBe("Xenova/whisper-base");
+    expect(result.current.sttLanguage).toBe("en");
+    expect(result.current.sttAutoLoad).toBe(false);
+    expect(result.current.ttsProvider).toBe("resemble");
+    expect(result.current.resembleVoiceUuid).toBe("61fcb769");
+    expect(result.current.ttsSpeed).toBe(1.0);
+    expect(result.current.ttsAutoSpeak).toBe(true);
+    expect(result.current.vadSensitivity).toBe(50);
+    expect(result.current.vadSilenceThreshold).toBe(500);
+    expect(result.current.overlayAlwaysOnTop).toBe(true);
+    expect(result.current.overlayOpacity).toBe(100);
+    expect(result.current.defaultMode).toBe("type");
+    expect(result.current.theme).toBe("dark");
+  });
+
+  it("setSTTModel updates the model", async () => {
+    const { useSettings } = await import("../features/minimalism/use-settings");
+    const { result } = renderHook(() => useSettings());
+    act(() => {
+      result.current.setSTTModel("Xenova/whisper-small");
+    });
+    expect(result.current.sttModel).toBe("Xenova/whisper-small");
+  });
+
+  it("setSTTLanguage updates the language", async () => {
+    const { useSettings } = await import("../features/minimalism/use-settings");
+    const { result } = renderHook(() => useSettings());
+    act(() => {
+      result.current.setSTTLanguage("ja");
+    });
+    expect(result.current.sttLanguage).toBe("ja");
+  });
+
+  it("setSTTAutoLoad updates auto-load flag", async () => {
+    const { useSettings } = await import("../features/minimalism/use-settings");
+    const { result } = renderHook(() => useSettings());
+    act(() => {
+      result.current.setSTTAutoLoad(true);
+    });
+    expect(result.current.sttAutoLoad).toBe(true);
+  });
+
+  it("addDownloadedModel adds model to list", async () => {
+    const { useSettings } = await import("../features/minimalism/use-settings");
+    const { result } = renderHook(() => useSettings());
+    act(() => {
+      result.current.addDownloadedModel("Xenova/whisper-base");
+    });
+    expect(result.current.downloadedModels).toContain("Xenova/whisper-base");
+  });
+
+  it("addDownloadedModel deduplicates entries", async () => {
+    const { useSettings } = await import("../features/minimalism/use-settings");
+    const { result } = renderHook(() => useSettings());
+    act(() => {
+      result.current.addDownloadedModel("Xenova/whisper-base");
+      result.current.addDownloadedModel("Xenova/whisper-base");
+    });
+    expect(
+      result.current.downloadedModels.filter((m) => m === "Xenova/whisper-base"),
+    ).toHaveLength(1);
+  });
+
+  it("setTTSProvider updates provider", async () => {
+    const { useSettings } = await import("../features/minimalism/use-settings");
+    const { result } = renderHook(() => useSettings());
+    act(() => {
+      result.current.setTTSProvider("local");
+    });
+    expect(result.current.ttsProvider).toBe("local");
+  });
+
+  it("setResembleApiKey updates API key", async () => {
+    const { useSettings } = await import("../features/minimalism/use-settings");
+    const { result } = renderHook(() => useSettings());
+    act(() => {
+      result.current.setResembleApiKey("test-key-123");
+    });
+    expect(result.current.resembleApiKey).toBe("test-key-123");
+  });
+
+  it("setResembleVoice updates voice UUID", async () => {
+    const { useSettings } = await import("../features/minimalism/use-settings");
+    const { result } = renderHook(() => useSettings());
+    act(() => {
+      result.current.setResembleVoice("custom-uuid");
+    });
+    expect(result.current.resembleVoiceUuid).toBe("custom-uuid");
+  });
+
+  it("setTTSSpeed updates speed", async () => {
+    const { useSettings } = await import("../features/minimalism/use-settings");
+    const { result } = renderHook(() => useSettings());
+    act(() => {
+      result.current.setTTSSpeed(1.5);
+    });
+    expect(result.current.ttsSpeed).toBe(1.5);
+  });
+
+  it("setTTSAutoSpeak updates auto-speak", async () => {
+    const { useSettings } = await import("../features/minimalism/use-settings");
+    const { result } = renderHook(() => useSettings());
+    act(() => {
+      result.current.setTTSAutoSpeak(false);
+    });
+    expect(result.current.ttsAutoSpeak).toBe(false);
+  });
+
+  it("setVADSensitivity updates sensitivity", async () => {
+    const { useSettings } = await import("../features/minimalism/use-settings");
+    const { result } = renderHook(() => useSettings());
+    act(() => {
+      result.current.setVADSensitivity(80);
+    });
+    expect(result.current.vadSensitivity).toBe(80);
+  });
+
+  it("setVADSilenceThreshold updates threshold", async () => {
+    const { useSettings } = await import("../features/minimalism/use-settings");
+    const { result } = renderHook(() => useSettings());
+    act(() => {
+      result.current.setVADSilenceThreshold(1000);
+    });
+    expect(result.current.vadSilenceThreshold).toBe(1000);
+  });
+
+  it("setOverlayAlwaysOnTop updates setting", async () => {
+    const { useSettings } = await import("../features/minimalism/use-settings");
+    const { result } = renderHook(() => useSettings());
+    act(() => {
+      result.current.setOverlayAlwaysOnTop(false);
+    });
+    expect(result.current.overlayAlwaysOnTop).toBe(false);
+  });
+
+  it("setOverlayAutoHide updates setting", async () => {
+    const { useSettings } = await import("../features/minimalism/use-settings");
+    const { result } = renderHook(() => useSettings());
+    act(() => {
+      result.current.setOverlayAutoHide(true);
+    });
+    expect(result.current.overlayAutoHide).toBe(true);
+  });
+
+  it("setOverlayOpacity updates opacity", async () => {
+    const { useSettings } = await import("../features/minimalism/use-settings");
+    const { result } = renderHook(() => useSettings());
+    act(() => {
+      result.current.setOverlayOpacity(75);
+    });
+    expect(result.current.overlayOpacity).toBe(75);
+  });
+
+  it("setDefaultMode updates mode", async () => {
+    const { useSettings } = await import("../features/minimalism/use-settings");
+    const { result } = renderHook(() => useSettings());
+    act(() => {
+      result.current.setDefaultMode("vad");
+    });
+    expect(result.current.defaultMode).toBe("vad");
+  });
+
+  it("setTheme updates theme", async () => {
+    const { useSettings } = await import("../features/minimalism/use-settings");
+    const { result } = renderHook(() => useSettings());
+    act(() => {
+      result.current.setTheme("light");
+    });
+    expect(result.current.theme).toBe("light");
+  });
+
+  it("setOverlayShortcut updates shortcut", async () => {
+    const { useSettings } = await import("../features/minimalism/use-settings");
+    const { result } = renderHook(() => useSettings());
+    act(() => {
+      result.current.setOverlayShortcut("Ctrl+Shift+Space");
+    });
+    expect(result.current.overlayShortcut).toBe("Ctrl+Shift+Space");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// ModelManager tests
+// ---------------------------------------------------------------------------
+
+describe("ModelManager", () => {
+  it("getModelInfo returns correct model for known id", async () => {
+    const { getModelInfo } = await import("../features/minimalism/ModelManager");
+    const info = getModelInfo("Xenova/whisper-base");
+    expect(info.name).toBe("Base");
+    expect(info.size).toBe("144 MB");
+    expect(info.speed).toBe("Fast");
+    expect(info.quality).toBe("Good");
+  });
+
+  it("getModelInfo defaults to base model for unknown id", async () => {
+    const { getModelInfo } = await import("../features/minimalism/ModelManager");
+    const info = getModelInfo("unknown-model");
+    expect(info.id).toBe("Xenova/whisper-base");
+  });
+
+  it("getLanguageName returns correct name", async () => {
+    const { getLanguageName } = await import("../features/minimalism/ModelManager");
+    expect(getLanguageName("en")).toBe("English");
+    expect(getLanguageName("zh")).toBe("Chinese");
+    expect(getLanguageName("ja")).toBe("Japanese");
+  });
+
+  it("getLanguageName defaults to English for unknown code", async () => {
+    const { getLanguageName } = await import("../features/minimalism/ModelManager");
+    expect(getLanguageName("unknown")).toBe("English");
+  });
+
+  it("STT_MODELS has all 5 models", async () => {
+    const { STT_MODELS } = await import("../features/minimalism/ModelManager");
+    expect(STT_MODELS).toHaveLength(5);
+  });
+
+  it("STT_LANGUAGES has all 10 languages", async () => {
+    const { STT_LANGUAGES } = await import("../features/minimalism/ModelManager");
+    expect(STT_LANGUAGES).toHaveLength(10);
+  });
+
+  it("RESEMBLE_VOICES has default voice", async () => {
+    const { RESEMBLE_VOICES } = await import("../features/minimalism/ModelManager");
+    expect(RESEMBLE_VOICES).toHaveLength(1);
+    expect(RESEMBLE_VOICES[0].uuid).toBe("61fcb769");
   });
 });

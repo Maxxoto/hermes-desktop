@@ -11,6 +11,12 @@ import {
   type AutomaticSpeechRecognitionPipeline,
 } from "@xenova/transformers";
 
+/** Model instance map for caching per-model pipelines. */
+const modelInstances: Map<
+  string,
+  Promise<AutomaticSpeechRecognitionPipeline>
+> = new Map();
+
 let cachedPipeline: AutomaticSpeechRecognitionPipeline | null = null;
 let loadingPromise: Promise<AutomaticSpeechRecognitionPipeline> | null = null;
 
@@ -21,32 +27,61 @@ export type WhisperLoadStatus = "idle" | "loading" | "ready" | "error";
 
 /**
  * Get (or lazily create) the Whisper ASR pipeline.
- * Caches after first load. Returns null on error.
+ * Caches after first load. Supports optional model parameter.
+ * Returns null on error.
  */
-export async function getTranscriber(): Promise<AutomaticSpeechRecognitionPipeline | null> {
-  if (cachedPipeline) return cachedPipeline;
+export async function getTranscriber(
+  modelId?: string,
+): Promise<AutomaticSpeechRecognitionPipeline | null> {
+  // Legacy path: no model specified, use singleton cache
+  if (!modelId) {
+    if (cachedPipeline) return cachedPipeline;
+    if (loadingPromise) return loadingPromise;
 
-  if (loadingPromise) return loadingPromise;
+    loadingPromise = (async () => {
+      try {
+        const pipe = await pipeline(
+          "automatic-speech-recognition",
+          "Xenova/whisper-base",
+          {
+            chunk_length_s: 30,
+            stride_length_s: 5,
+          } as Parameters<typeof pipeline>[2],
+        );
+        cachedPipeline = pipe;
+        return pipe;
+      } catch (err) {
+        loadingPromise = null;
+        throw err;
+      }
+    })();
 
-  loadingPromise = (async () => {
+    return loadingPromise;
+  }
+
+  // Per-model caching
+  if (modelInstances.has(modelId)) {
+    return modelInstances.get(modelId)!;
+  }
+
+  const promise = (async () => {
     try {
-      const pipe = await pipeline(
+      return await pipeline(
         "automatic-speech-recognition",
-        "Xenova/whisper-base",
+        modelId,
         {
           chunk_length_s: 30,
           stride_length_s: 5,
         } as Parameters<typeof pipeline>[2],
       );
-      cachedPipeline = pipe;
-      return pipe;
     } catch (err) {
-      loadingPromise = null;
+      modelInstances.delete(modelId);
       throw err;
     }
   })();
 
-  return loadingPromise;
+  modelInstances.set(modelId, promise);
+  return promise;
 }
 
 /**

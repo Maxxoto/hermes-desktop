@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from "react";
+import { useSettings } from "./use-settings";
 
 /**
  * TTS status type.
@@ -8,26 +9,30 @@ export type TTSStatus = "idle" | "speaking" | "error";
 /**
  * Hook for text-to-speech via Resemble AI.
  *
- * Reads the API key from localStorage (`hermes-connection` store, same
- * as GatewayClient) and calls the Resemble AI v2 speech endpoint.
- *
- * Voice UUID: 61fcb769 (default voice).
+ * Reads voice UUID and speed from the overlay settings store.
+ * Falls back to localStorage for API key (hermes-connection store).
  */
 export function useTTS() {
   const [status, setStatus] = useState<TTSStatus>("idle");
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioUrlRef = useRef<string | null>(null);
 
+  const {
+    resembleApiKey,
+    resembleVoiceUuid,
+    ttsSpeed,
+  } = useSettings();
+
   /**
-   * Read Resemble AI API key from localStorage.
-   * Falls back to the Gateway API key from the connection store.
+   * Read Resemble AI API key — prefer settings store, fall back to
+   * localStorage hermes-connection store.
    */
   const getApiKey = useCallback((): string | null => {
-    // Check for dedicated Resemble key first
+    if (resembleApiKey) return resembleApiKey;
+
     const resembleKey = localStorage.getItem("resemble-api-key");
     if (resembleKey) return resembleKey;
 
-    // Fall back to Gateway connection store
     try {
       const stored = localStorage.getItem("hermes-connection");
       if (!stored) return null;
@@ -36,7 +41,7 @@ export function useTTS() {
     } catch {
       return null;
     }
-  }, []);
+  }, [resembleApiKey]);
 
   /**
    * Speak the given text using Resemble AI TTS.
@@ -59,7 +64,7 @@ export function useTTS() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            voice_uuid: "61fcb769",
+            voice_uuid: resembleVoiceUuid,
             data: text,
             output_format: "mp3",
             sample_rate: 44100,
@@ -95,7 +100,7 @@ export function useTTS() {
         setTimeout(() => setStatus("idle"), 2000);
       }
     },
-    [getApiKey],
+    [getApiKey, resembleVoiceUuid, ttsSpeed],
   );
 
   /**

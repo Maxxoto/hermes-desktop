@@ -1,12 +1,15 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import CompactChat from "./CompactChat";
+import SettingsPage from "./SettingsPage";
 
 /**
  * OverlayApp — Standalone React root for the overlay window.
  * Handles ESC to dismiss (via Tauri window hide).
- * CompactChat handles its own TTS and VAD cleanup internally.
+ * Routes between CompactChat and SettingsPage.
  */
 export default function OverlayApp() {
+  const [view, setView] = useState<"chat" | "settings">("chat");
+
   const handleKeyDown = useCallback(async (e: KeyboardEvent) => {
     if (e.key === "Escape") {
       try {
@@ -23,12 +26,19 @@ export default function OverlayApp() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
+  const openSettings = useCallback(() => setView("settings"), []);
+  const closeSettings = useCallback(() => setView("chat"), []);
+
   return (
     <div
       className="fixed inset-0 flex items-center justify-center"
       style={{ background: "transparent" }}
     >
-      <CompactChat />
+      {view === "settings" ? (
+        <SettingsPage onBack={closeSettings} />
+      ) : (
+        <CompactChat onOpenSettings={openSettings} />
+      )}
     </div>
   );
 }

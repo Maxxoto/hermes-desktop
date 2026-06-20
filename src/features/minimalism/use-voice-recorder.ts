@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { getTranscriber, type WhisperLoadStatus } from "./whisper";
+import { useSettings } from "./use-settings";
 
 /**
  * Voice recorder status type.
@@ -27,6 +28,8 @@ export function useVoiceRecorder() {
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
+  const { sttModel } = useSettings();
+
   /**
    * Ensure the Whisper model is loaded. Shows loading-model status while
    * the model downloads (first time only, ~150MB). Cached in IndexedDB.
@@ -37,7 +40,7 @@ export function useVoiceRecorder() {
     setWhisperStatus("loading");
     setStatus("loading-model");
     try {
-      await getTranscriber();
+      await getTranscriber(sttModel);
       setWhisperStatus("ready");
       setStatus("idle");
       return true;
@@ -46,7 +49,7 @@ export function useVoiceRecorder() {
       setStatus("error");
       return false;
     }
-  }, [whisperStatus]);
+  }, [whisperStatus, sttModel]);
 
   /**
    * Start recording audio from the microphone.

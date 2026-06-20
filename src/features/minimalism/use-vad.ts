@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { getTranscriber } from "./whisper";
+import { useSettings } from "./use-settings";
 
 /**
  * VAD status type.
@@ -10,6 +11,7 @@ export type VADStatus = "idle" | "listening" | "speaking" | "processing";
  * Hook for Voice Activity Detection using @ricky0123/vad-web.
  * Continuously listens for speech, starts recording on speech detection,
  * and transcribes using local Whisper on silence.
+ * Reads sensitivity and silence threshold from the overlay settings store.
  */
 export function useVAD(options?: {
   onSpeechEnd?: (transcript: string) => void;
@@ -22,7 +24,10 @@ export function useVAD(options?: {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const silenceThresholdMs = options?.silenceThresholdMs ?? 500;
+
+  const { vadSilenceThreshold } = useSettings();
+  const silenceThresholdMs =
+    options?.silenceThresholdMs ?? vadSilenceThreshold;
 
   /**
    * Start VAD listening.

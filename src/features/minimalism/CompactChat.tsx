@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Send, X, Keyboard, Mic, Activity, Volume2, VolumeX } from "lucide-react";
+import { Send, X, Keyboard, Mic, Activity, Volume2, VolumeX, Settings } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useOverlayMode, type OverlayMode } from "./use-overlay-window";
 import { useVoiceRecorder } from "./use-voice-recorder";
@@ -17,7 +17,11 @@ import {
  * Supports Type, PTT, and VAD modes.
  * Includes TTS playback via Resemble AI.
  */
-export default function CompactChat() {
+export default function CompactChat({
+  onOpenSettings,
+}: {
+  onOpenSettings?: () => void;
+}) {
   const { mode, setMode } = useOverlayMode();
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState<
@@ -407,6 +411,18 @@ export default function CompactChat() {
             {modeLabels[mode].icon}
             <span>{modeLabels[mode].label}</span>
           </button>
+
+          {/* Settings button */}
+          {onOpenSettings && (
+            <button
+              onClick={onOpenSettings}
+              title="Settings"
+              aria-label="Open settings"
+              className="mac-icon-btn !w-6 !h-6"
+            >
+              <Settings className="h-3 w-3" />
+            </button>
+          )}
 
           {/* Close button */}
           <button
