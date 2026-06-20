@@ -17,6 +17,21 @@ export function useInitializeConnection() {
   return useQuery({
     queryKey: ["connection", "initialize"],
     queryFn: async () => {
+      // In browser mode, no Tauri keychain — try localStorage fallback
+      if (!isTauri()) {
+        try {
+          const stored = localStorage.getItem("hermes-desktop-credentials");
+          if (stored) {
+            const creds = JSON.parse(stored);
+            setCredentials(creds.gateway_url, creds.api_key);
+            return creds;
+          }
+        } catch {
+          // ignore parse errors
+        }
+        return null;
+      }
+
       const creds: { gateway_url: string; api_key: string } | null =
         await invoke("load_credentials");
 

@@ -46,11 +46,20 @@ export default function ConnectionConfigPage() {
 
     setCredentials(url.trim(), key.trim());
 
+    // Persist credentials — Tauri keychain or localStorage fallback
     try {
-      await invoke("store_credentials", {
-        url: url.trim(),
-        apiKey: key.trim(),
-      });
+      const isTauri = typeof window !== "undefined" && "__TAURI__" in window;
+      if (isTauri) {
+        await invoke("store_credentials", {
+          url: url.trim(),
+          apiKey: key.trim(),
+        });
+      } else {
+        localStorage.setItem(
+          "hermes-desktop-credentials",
+          JSON.stringify({ gateway_url: url.trim(), api_key: key.trim() })
+        );
+      }
       navigate("/chat", { replace: true });
     } catch (err) {
       console.error("Failed to persist credentials:", err);
