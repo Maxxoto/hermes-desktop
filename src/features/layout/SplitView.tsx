@@ -68,7 +68,6 @@ export default function SplitView({ leftPanel, rightPanel, onClose }: SplitViewP
         className="flex flex-col min-h-0 overflow-hidden"
         style={{
           width: `${leftPercent}%`,
-          transition: isDragging ? "none" : "width 200ms ease-out",
         }}
       >
         {leftPanel}
@@ -97,7 +96,6 @@ export default function SplitView({ leftPanel, rightPanel, onClose }: SplitViewP
         className="flex flex-col min-h-0 overflow-hidden relative"
         style={{
           width: `${rightPercent}%`,
-          transition: isDragging ? "none" : "width 200ms ease-out",
         }}
       >
         {/* Close button to return to single view */}

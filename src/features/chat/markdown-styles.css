@@ -104,7 +104,7 @@
 
 /* Blockquotes */
 .markdown-prose blockquote {
-  border-left: 3px solid var(--mac-opaque-separator);
+  border-left: 1px solid var(--mac-separator);
   padding-left: 1rem;
   margin: 0.75em 0;
   color: var(--mac-secondary-label);
