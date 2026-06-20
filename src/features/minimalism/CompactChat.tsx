@@ -367,6 +367,28 @@ export default function CompactChat({
     setMode(modes[nextIdx]);
   }, [mode, setMode]);
 
+  // Overlay keyboard shortcuts (EPIC 9)
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const mod = e.metaKey || e.ctrlKey;
+      if (!mod) return;
+
+      switch (e.key.toLowerCase()) {
+        case "m":
+          e.preventDefault();
+          toggleMute();
+          break;
+        case "/":
+          e.preventDefault();
+          cycleMode();
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [toggleMute, cycleMode]);
+
   // Handle voice button actions for PTT mode
   const handleVoiceStart = useCallback(async () => {
     await voiceRecorder.startRecording();

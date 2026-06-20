@@ -4,8 +4,10 @@ import { useSessions } from './use-sessions';
 import SessionItem from './SessionItem';
 import FolderTree from '../folders/FolderTree';
 import TagFilter from '../tags/TagFilter';
+import SpaceBar from '../spaces/SpaceBar';
 import { useFolderStore } from '../folders/use-folders';
 import { useTagStore } from '../tags/use-tags';
+import { useSpaces } from '../spaces/use-spaces';
 import type { Session } from '../connection/gateway-api';
 
 interface SessionListProps {
@@ -95,11 +97,17 @@ export default function SessionList({
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [selectedTagId, setSelectedTagId] = useState<string | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
 
   const getSessionsInFolder = useFolderStore((s) => s.getSessionsInFolder);
   const sessionFolders = useFolderStore((s) => s.sessionFolders);
   const getSessionsWithTag = useTagStore((s) => s.getSessionsWithTag);
   const sessionTags = useTagStore((s) => s.sessionTags);
+
+  // Space filtering
+  const activeSpaceId = useSpaces((s) => s.activeSpaceId);
+  const getSpaceSessions = useSpaces((s) => s.getSpaceSessions);
 
   // Listen for Cmd/Ctrl+K to focus search
   useEffect(() => {
@@ -114,6 +122,13 @@ export default function SessionList({
   const filteredSessions = useMemo(() => {
     if (!sessions) return [];
     let result = sessions;
+
+    // Filter by space (show only sessions in the active space, unless "default" which shows all)
+    if (activeSpaceId !== 'default') {
+      const spaceSessionIds = getSpaceSessions(activeSpaceId);
+      const spaceSessionIdSet = new Set(spaceSessionIds);
+      result = result.filter((s) => spaceSessionIdSet.has(s.id));
+    }
 
     // Filter by folder
     if (selectedFolderId !== null) {
@@ -148,6 +163,8 @@ export default function SessionList({
     searchQuery,
     selectedFolderId,
     selectedTagId,
+    activeSpaceId,
+    getSpaceSessions,
     getSessionsInFolder,
     sessionFolders,
     getSessionsWithTag,
@@ -159,8 +176,68 @@ export default function SessionList({
     [filteredSessions],
   );
 
+  // Flat list for keyboard navigation indexing
+  const flatList = useMemo(() => {
+    const result: Session[] = [];
+    for (const [, sessions] of grouped) {
+      result.push(...sessions);
+    }
+    return result;
+  }, [grouped]);
+
+  // Reset focus index when filtered list changes
+  useEffect(() => {
+    setFocusedIndex(-1);
+  }, [flatList.length]);
+
+  // Arrow key navigation
+  useEffect(() => {
+    if (flatList.length === 0) return;
+    const focusedRef = { current: focusedIndex };
+    focusedRef.current = focusedIndex;
+
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target;
+      const isInput =
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        (target instanceof HTMLElement && target.isContentEditable);
+      if (isInput) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setFocusedIndex((prev) =>
+          prev < flatList.length - 1 ? prev + 1 : prev,
+        );
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setFocusedIndex((prev) => (prev > 0 ? prev - 1 : 0));
+      } else if (e.key === 'Enter' && focusedRef.current >= 0 && focusedRef.current < flatList.length) {
+        e.preventDefault();
+        onSelectSession(flatList[focusedRef.current].id);
+      }
+    };
+
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [flatList, onSelectSession, focusedIndex]);
+
+  // Scroll focused item into view
+  useEffect(() => {
+    if (focusedIndex < 0 || !listRef.current) return;
+    const el = listRef.current.querySelector(
+      `[data-focusable="true"]`,
+    );
+    if (el) {
+      el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }, [focusedIndex]);
+
   return (
     <div className="sidebar flex flex-col h-full dark:text-mac-label light:text-black">
+      {/* Space bar */}
+      <SpaceBar />
+
       {/* Header */}
       <div className="shrink-0 px-4 pt-3 pb-2">
         <button
@@ -211,29 +288,37 @@ export default function SessionList({
       </div>
 
       {/* Sessions list */}
-      <div className="flex-1 overflow-y-auto min-h-0">
+      <div className="flex-1 overflow-y-auto min-h-0" ref={listRef}>
         {isLoading ? (
           <LoadingSkeleton />
         ) : grouped.length === 0 ? (
           <EmptyState />
         ) : (
           <div className="pb-2">
-            {grouped.map(([group, groupSessions]) => (
-              <div key={group}>
-                <div className="px-4 pt-3 pb-1 text-[11px] font-semibold tracking-wide
-                  dark:text-mac-tertiary-label light:text-gray-500 uppercase select-none">
-                  {group}
+            {(() => {
+              let flatIdx = -1;
+              return grouped.map(([group, groupSessions]) => (
+                <div key={group}>
+                  <div className="px-4 pt-3 pb-1 text-[11px] font-semibold tracking-wide
+                    dark:text-mac-tertiary-label light:text-gray-500 uppercase select-none">
+                    {group}
+                  </div>
+                  {groupSessions.map((session) => {
+                    flatIdx++;
+                    const idx = flatIdx;
+                    return (
+                      <SessionItem
+                        key={session.id}
+                        session={session}
+                        isActive={session.id === activeSessionId}
+                        isFocused={idx === focusedIndex}
+                        onClick={() => onSelectSession(session.id)}
+                      />
+                    );
+                  })}
                 </div>
-                {groupSessions.map((session) => (
-                  <SessionItem
-                    key={session.id}
-                    session={session}
-                    isActive={session.id === activeSessionId}
-                    onClick={() => onSelectSession(session.id)}
-                  />
-                ))}
-              </div>
-            ))}
+              ));
+            })()}
           </div>
         )}
       </div>

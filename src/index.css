@@ -149,6 +149,13 @@ input[type="email"], textarea, [contenteditable] { cursor: text; }
   border-radius: 6px;
 }
 
+/* ---- Keyboard navigation focus ring -------------------------------------- */
+[data-focusable="true"] {
+  outline: 2px solid var(--mac-accent);
+  outline-offset: -2px;
+  border-radius: 8px;
+}
+
 /* ---- Reduced motion ------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

@@ -16,6 +16,7 @@ import {
 import { useConnectionStore } from "../connection/connection-store";
 import { useWindowTitle } from "../../hooks/use-window-title";
 import { useKeyboardShortcuts } from "../../hooks/use-keyboard-shortcuts";
+import { useKeyboardNavigation } from "../../hooks/use-keyboard-navigation";
 import { useTheme } from "../../hooks/use-theme";
 import { useDeleteSession } from "../sessions/use-sessions";
 import { useAgentNotifications } from "../../hooks/use-agent-notifications";
@@ -29,6 +30,8 @@ import AgentSelector from "../agents/AgentSelector";
 import ModelPicker from "../agents/ModelPicker";
 import { useFileUpload } from "../files/use-file-upload";
 import DropZone from "../files/DropZone";
+import { useSpaceShortcuts } from "../../hooks/use-space-shortcuts";
+import { useSpaces } from "../spaces/use-spaces";
 
 export default function ChatPage() {
   const navigate = useNavigate();
@@ -55,6 +58,12 @@ export default function ChatPage() {
   const toggleSplitView = useLayoutStore((s) => s.toggleSplitView);
 
   const autoTitle = useAutoTitle();
+
+  // Space shortcuts (Cmd+1-9 to switch, Cmd+Shift+N to create)
+  useSpaceShortcuts();
+
+  // Space session binding
+  const addSessionToActiveSpace = useSpaces((s) => s.addSessionToActiveSpace);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -149,6 +158,30 @@ export default function ChatPage() {
     onToggleSplitView: toggleSplitView,
   });
 
+  // Global keyboard navigation (EPIC 9)
+  const focusSearch = useCallback(() => {
+    window.dispatchEvent(new CustomEvent("hermes:focus-search"));
+  }, []);
+
+  useKeyboardNavigation({
+    onNewChat: useCallback(() => {
+      clear();
+    }, [clear]),
+    onDeleteSession: useCallback(() => {
+      if (sessionId) {
+        deleteSession.mutate(sessionId);
+        clear();
+      }
+    }, [sessionId, deleteSession, clear]),
+    onEditSession: undefined, // Handled by SessionItem directly
+    onFocusSearch: focusSearch,
+    onToggleSidebar: toggleSidebar,
+    onBack: useCallback(() => {
+      // Close command palette if open
+      setShowCommandPalette(false);
+    }, []),
+  });
+
   // auto-scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -187,6 +220,8 @@ export default function ChatPage() {
           currentSessionId = session.id;
           setSession(currentSessionId);
           isNewSession = true;
+          // Add new session to the active space
+          addSessionToActiveSpace(session.id);
         } catch (err) {
           addMessage({
             id: `err_${Date.now()}`,
@@ -285,6 +320,7 @@ export default function ChatPage() {
       selectedModel,
       files,
       clearFiles,
+      addSessionToActiveSpace,
     ]
   );
 
