@@ -141,6 +141,12 @@ export default function SessionList({
             placeholder="Search conversations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape" && searchQuery) {
+                e.stopPropagation();
+                setSearchQuery("");
+              }
+            }}
             className="w-full h-[26px] pl-7 pr-2 glass-input
               dark:text-mac-label light:text-black
               text-[13px] dark:placeholder:text-mac-tertiary-label light:placeholder:text-gray-400

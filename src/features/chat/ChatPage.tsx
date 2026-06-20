@@ -347,12 +347,14 @@ export default function ChatPage() {
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full dark:text-mac-tertiary-label light:text-gray-400 min-h-[60vh]">
             <div className="relative">
-              {/* Ambient blob behind the icon */}
               <div className="ambient-blob w-24 h-24 dark:bg-mac-accent/20 light:bg-blue-400/15 -top-4 -left-4" style={{ animationDelay: "0s" }} />
               <MessageSquare className="h-14 w-14 sm:h-16 sm:w-16 mb-3 opacity-30 relative z-10" />
             </div>
             <p className="text-[13px] font-medium mt-2">Start a conversation</p>
-            <p className="text-[11px] mt-1 opacity-60">Your messages will appear here</p>
+            <p className="text-[11px] mt-1 opacity-60">Type a message below to begin chatting with Hermes</p>
+            <p className="text-[10px] mt-3 opacity-40">
+              Press <kbd className="px-1 py-0.5 rounded text-[9px]" style={{ background: "rgba(255,255,255,0.08)" }}>⌘K</kbd> for commands
+            </p>
           </div>
         )}
         {messages.map((msg) => (

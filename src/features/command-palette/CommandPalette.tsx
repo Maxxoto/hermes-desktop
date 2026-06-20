@@ -128,10 +128,13 @@ export function CommandPalette({
     <div
       className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh]"
       data-testid="command-palette-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Command palette"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      onKeyDown={(e) => {
+      onKeyDownCapture={(e) => {
         if (e.key === "Escape") {
           e.preventDefault();
           e.stopPropagation();
