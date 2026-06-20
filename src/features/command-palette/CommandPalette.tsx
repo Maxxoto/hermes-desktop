@@ -19,8 +19,14 @@ import {
   Clipboard,
   Settings,
   MessageSquare,
+  PanelLeftClose,
+  SearchCode,
+  Sparkles,
+  Hash,
+  Bookmark,
 } from "lucide-react";
 import type { Session } from "../connection/gateway-api";
+import { useBookmarkStore } from "../blocks/use-bookmarks";
 
 export interface CommandPaletteProps {
   open: boolean;
@@ -248,9 +254,42 @@ export function CommandPalette({
                 onSelect={handleSelect}
               />
               <ActionRow
+                value="toggle-sidebar"
+                icon={<PanelLeftClose className="w-4 h-4" />}
+                label="Toggle Sidebar"
+                shortcut="⌘B"
+                disabled
+                onSelect={handleSelect}
+              />
+              <ActionRow
+                value="full-search"
+                icon={<SearchCode className="w-4 h-4" />}
+                label="Full Search"
+                shortcut="⌘⇧F"
+                disabled
+                onSelect={handleSelect}
+              />
+              <ActionRow
+                value="overlay"
+                icon={<Sparkles className="w-4 h-4" />}
+                label="Toggle Overlay"
+                shortcut="⌘."
+                disabled
+                onSelect={handleSelect}
+              />
+              <ActionRow
+                value="switch-space"
+                icon={<Hash className="w-4 h-4" />}
+                label="Switch Space"
+                shortcut="⌘1-4"
+                disabled
+                onSelect={handleSelect}
+              />
+              <ActionRow
                 value="export"
                 icon={<Download className="w-4 h-4" />}
                 label="Export Chat"
+                shortcut="⌘⇧E"
                 disabled={!currentSessionId}
                 onSelect={handleSelect}
               />
@@ -294,6 +333,9 @@ export function CommandPalette({
                 onSelect={handleSelect}
               />
             </Command.Group>
+
+            {/* Bookmarks */}
+            <BookmarksGroup />
           </Command.List>
         </Command>
       </div>
@@ -377,6 +419,44 @@ function ActionRow({
         </span>
       )}
     </Command.Item>
+  );
+}
+
+function BookmarksGroup() {
+  const bookmarks = useBookmarkStore((s) => s.bookmarks);
+
+  if (bookmarks.length === 0) return null;
+
+  return (
+    <Command.Group
+      heading={`Bookmarks (${bookmarks.length})`}
+      className="[&_[cmdk-group-heading]]:px-4 [&_[cmdk-group-heading]]:py-2
+                 [&_[cmdk-group-heading]]:text-[11px]
+                 [&_[cmdk-group-heading]]:font-semibold
+                 [&_[cmdk-group-heading]]:tracking-wide
+                 [&_[cmdk-group-heading]]:uppercase
+                 [&_[cmdk-group-heading]]:text-mac-tertiary-label"
+    >
+      {bookmarks.slice(0, 10).map((bm) => (
+        <Command.Item
+          key={bm.id}
+          value={`bookmark:${bm.id}`}
+          className="flex items-center gap-3 px-4 h-[36px] rounded-lg mx-2
+                     text-[13px] leading-4 text-mac-label
+                     cursor-default transition-all duration-150
+                     data-[selected=true]:text-mac-accent data-[selected=true]:bg-white/[0.06]"
+          style={{ background: "transparent" }}
+        >
+          <Bookmark className="w-4 h-4 flex-shrink-0 opacity-50 dark:text-mac-orange light:text-orange-500" />
+          <div className="flex-1 min-w-0">
+            <div className="truncate">{bm.content.slice(0, 80)}</div>
+          </div>
+          <span className="flex-shrink-0 text-[10px] text-mac-tertiary-label">
+            {new Date(bm.timestamp).toLocaleDateString()}
+          </span>
+        </Command.Item>
+      ))}
+    </Command.Group>
   );
 }
 
