@@ -222,7 +222,8 @@ describe("SessionItem", () => {
       <SessionItem session={makeSession()} isActive={true} onClick={onClick} />,
     );
     const item = container.querySelector('[role="button"]');
-    expect(item?.className).toContain("bg-blue-900/50");
+    // Spec: selection uses rounded rect background (dark:bg-white/10), NOT left-border
+    expect(item?.className).toContain("dark:bg-white/10");
   });
 
   it("does not show active styling when isActive is false", () => {
@@ -230,7 +231,7 @@ describe("SessionItem", () => {
       <SessionItem session={makeSession()} isActive={false} onClick={onClick} />,
     );
     const item = container.querySelector('[role="button"]');
-    expect(item?.className).not.toContain("bg-blue-900/50");
+    expect(item?.className).not.toContain("dark:bg-white/10");
   });
 
   // ---- Source icon ---------------------------------------------------------

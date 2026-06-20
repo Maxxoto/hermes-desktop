@@ -10,28 +10,29 @@ export default function StatusBar() {
     !isLoading && !isError && data !== undefined && isConnected(data.status);
 
   return (
-    <footer className="flex h-9 items-center justify-between border-t border-gray-800 bg-gray-900 px-4 text-xs text-gray-300">
+    <footer className="flex items-center justify-between border-t dark:border-mac-separator light:border-gray-200 dark:bg-mac-window light:bg-[#ECECEC] px-5 text-[10px] dark:text-mac-tertiary-label light:text-gray-400"
+      style={{ height: "24px" }}>
       {/* Left — Connection indicator */}
       <div className="flex items-center gap-2">
         {isLoading ? (
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-yellow-400" />
+            <span className="inline-block h-2 w-2 animate-pulse rounded-full dark:bg-mac-orange light:bg-orange-500" />
             Connecting…
           </span>
         ) : connected ? (
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]" />
+            <span className="inline-block h-2 w-2 animate-pulse rounded-full dark:bg-mac-green light:bg-green-500 shadow-[0_0_6px_rgba(50,215,75,0.6)]" />
             Connected
           </span>
         ) : (
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.6)]" />
+            <span className="inline-block h-2 w-2 animate-pulse rounded-full dark:bg-mac-red light:bg-red-500 shadow-[0_0_6px_rgba(255,69,58,0.6)]" />
             {reconnectIn !== null ? (
-              <span className="text-red-400">
+              <span className="dark:text-mac-red light:text-red-500">
                 Connection lost — reconnecting in {reconnectIn}s.
               </span>
             ) : (
-              <span className="text-red-400">Connection lost — retrying…</span>
+              <span className="dark:text-mac-red light:text-red-500">Connection lost — retrying…</span>
             )}
           </span>
         )}
@@ -40,12 +41,12 @@ export default function StatusBar() {
       {/* Right — Sessions + version */}
       <div className="flex items-center gap-4">
         {data && (
-          <span className="text-gray-400">
+          <span className="dark:text-mac-tertiary-label light:text-gray-400">
             {data.activeSessions} active session
             {data.activeSessions !== 1 ? "s" : ""}
           </span>
         )}
-        <span className="font-mono text-gray-500">
+        <span className="font-mono dark:text-mac-tertiary-label light:text-gray-400">
           v{data?.version ?? "?"}
         </span>
       </div>

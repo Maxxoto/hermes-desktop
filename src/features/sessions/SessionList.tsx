@@ -52,16 +52,16 @@ function groupSessions(sessions: Session[]): [DateGroup, Session[]][] {
 
 function LoadingSkeleton() {
   return (
-    <div className="flex flex-col gap-2 px-3 py-4">
+    <div className="flex flex-col gap-2 px-4 py-3">
       {Array.from({ length: 5 }).map((_, i) => (
-        <div key={i} className="flex items-start gap-3 animate-pulse px-2 py-2.5">
-          <div className="w-4 h-4 rounded bg-gray-700 shrink-0 mt-0.5" />
+        <div key={i} className="flex items-start gap-2 animate-pulse px-0 py-1">
+          <div className="w-4 h-4 rounded bg-white/10 dark:bg-white/10 shrink-0 mt-0.5" />
           <div className="flex-1 space-y-1.5">
             <div className="flex items-center justify-between gap-2">
-              <div className="h-3.5 bg-gray-700 rounded w-3/5" />
-              <div className="h-3 w-8 bg-gray-700 rounded" />
+              <div className="h-3 bg-white/10 dark:bg-white/10 rounded w-3/5" />
+              <div className="h-3 w-8 bg-white/5 dark:bg-white/5 rounded" />
             </div>
-            <div className="h-3 bg-gray-700 rounded w-2/5" />
+            <div className="h-3 bg-white/5 dark:bg-white/5 rounded w-2/5" />
           </div>
         </div>
       ))}
@@ -72,9 +72,9 @@ function LoadingSkeleton() {
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center text-center px-4 py-12">
-      <MessageSquare className="w-10 h-10 text-gray-600 mb-3" />
-      <p className="text-sm text-gray-400">No conversations yet</p>
-      <p className="text-xs text-gray-600 mt-1">
+      <MessageSquare className="w-10 h-10 dark:text-mac-tertiary-label light:text-gray-400 mb-3" />
+      <p className="text-[13px] dark:text-mac-secondary-label light:text-gray-600">No conversations yet</p>
+      <p className="text-[10px] dark:text-mac-tertiary-label light:text-gray-400 mt-1">
         Start a new chat to begin
       </p>
     </div>
@@ -119,14 +119,12 @@ export default function SessionList({
   );
 
   return (
-    <div className="flex flex-col h-full bg-gray-900 text-gray-100">
+    <div className="sidebar flex flex-col h-full dark:text-mac-label light:text-black">
       {/* Header */}
-      <div className="shrink-0 px-3 pt-3 pb-2">
+      <div className="shrink-0 px-4 pt-3 pb-2">
         <button
           onClick={onNewChat}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg
-            bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium
-            transition-colors cursor-pointer"
+          className="mac-btn mac-btn-primary w-full flex items-center justify-center gap-2"
         >
           <MessageSquarePlus className="w-4 h-4" />
           New Chat
@@ -134,18 +132,21 @@ export default function SessionList({
       </div>
 
       {/* Search */}
-      <div className="shrink-0 px-3 pb-2">
+      <div className="shrink-0 px-4 pb-2">
         <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 dark:text-mac-tertiary-label light:text-gray-400 pointer-events-none" />
           <input
             ref={searchInputRef}
             type="text"
             placeholder="Search conversations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 rounded-md bg-gray-800 border border-gray-700
-              text-sm text-gray-100 placeholder-gray-500
-              focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+            className="w-full h-[22px] pl-7 pr-2 rounded-[4px]
+              dark:bg-mac-control dark:border-[rgba(255,255,255,0.1)] dark:text-mac-label
+              light:bg-white light:border-gray-300 light:text-black
+              border text-[13px] dark:placeholder:text-mac-tertiary-label light:placeholder:text-gray-400
+              focus:outline-none focus:border-[var(--mac-accent)]
+              focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]
               transition-colors"
           />
         </div>
@@ -161,7 +162,8 @@ export default function SessionList({
           <div className="pb-2">
             {grouped.map(([group, groupSessions]) => (
               <div key={group}>
-                <div className="px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                <div className="px-4 pt-3 pb-1 text-[11px] font-semibold tracking-wide
+                  dark:text-mac-tertiary-label light:text-gray-500 uppercase select-none">
                   {group}
                 </div>
                 {groupSessions.map((session) => (

@@ -83,7 +83,7 @@ export function ExportButton({ messages, sessionTitle, disabled }: ExportButtonP
       onClick={handleExport}
       title="Export as Markdown"
       disabled={disabled || messages.length === 0 || exporting}
-      className="p-1.5 rounded-lg text-gray-500 hover:text-gray-200 hover:bg-gray-800 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+      className="mac-icon-btn disabled:opacity-30"
     >
       <Download className="h-4 w-4" />
     </button>

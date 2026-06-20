@@ -137,11 +137,12 @@ export default function SessionItem({ session, isActive, onClick }: SessionItemP
   if (isEditing) {
     return (
       <div
-        className={`w-full px-3 py-2.5 flex items-center gap-2 transition-colors
-          ${isActive ? "bg-blue-900/50 border-l-2 border-blue-500" : "border-l-2 border-transparent"}`}
+        className={`w-full mx-2 px-3 py-1.5 flex items-center gap-2 rounded-md transition-colors
+          ${isActive ? "dark:bg-white/10 light:bg-black/10" : ""}`}
+        style={{ width: "calc(100% - 16px)" }}
       >
-        <div className="shrink-0 mt-0.5">
-          <Icon className="w-4 h-4 text-gray-400" />
+        <div className="shrink-0">
+          <Icon className="w-4 h-4 dark:text-mac-secondary-label light:text-gray-500" />
         </div>
         <input
           ref={editInputRef}
@@ -150,20 +151,23 @@ export default function SessionItem({ session, isActive, onClick }: SessionItemP
           onChange={(e) => setEditTitle(e.target.value)}
           onKeyDown={handleEditKeyDown}
           onBlur={commitRename}
-          className="flex-1 min-w-0 px-2 py-0.5 rounded bg-gray-800 border border-gray-600
-            text-sm text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="flex-1 min-w-0 h-[22px] px-2 rounded-[4px]
+            dark:bg-mac-control dark:border-[rgba(255,255,255,0.1)] dark:text-mac-label
+            light:bg-white light:border-gray-300 light:text-black
+            border text-[13px] focus:outline-none focus:border-[var(--mac-accent)]
+            focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]"
         />
         <button
           onClick={commitRename}
           title="Save"
-          className="shrink-0 p-1 rounded text-green-400 hover:bg-gray-700 transition-colors cursor-pointer"
+          className="mac-icon-btn !w-6 !h-6 dark:text-mac-green light:text-green-600"
         >
           <Check className="w-3.5 h-3.5" />
         </button>
         <button
           onClick={cancelRename}
           title="Cancel"
-          className="shrink-0 p-1 rounded text-gray-400 hover:bg-gray-700 transition-colors cursor-pointer"
+          className="mac-icon-btn !w-6 !h-6 dark:text-mac-secondary-label light:text-gray-500"
         >
           <X className="w-3.5 h-3.5" />
         </button>
@@ -176,26 +180,26 @@ export default function SessionItem({ session, isActive, onClick }: SessionItemP
   if (showDeleteConfirm) {
     return (
       <div
-        className={`w-full px-3 py-2.5 flex items-center gap-2 transition-colors
-          ${isActive ? "bg-blue-900/50 border-l-2 border-blue-500" : "border-l-2 border-transparent"}`}
+        className={`w-full mx-2 px-3 py-1.5 flex items-center gap-2 rounded-md transition-colors
+          ${isActive ? "dark:bg-white/10 light:bg-black/10" : ""}`}
+        style={{ width: "calc(100% - 16px)" }}
       >
         <div className="flex-1 min-w-0">
-          <span className="text-xs text-red-400 truncate block">
+          <span className="text-[11px] dark:text-mac-red light:text-red-500 truncate block">
             Delete this conversation?
           </span>
         </div>
         <button
           onClick={handleConfirmDelete}
           title="Confirm delete"
-          className="shrink-0 px-2 py-1 rounded text-xs font-medium bg-red-600 hover:bg-red-500
-            text-white transition-colors cursor-pointer"
+          className="mac-btn mac-btn-destructive !h-5 px-2 text-[11px]"
         >
           Delete
         </button>
         <button
           onClick={handleCancelDelete}
           title="Cancel"
-          className="shrink-0 p-1 rounded text-gray-400 hover:bg-gray-700 transition-colors cursor-pointer"
+          className="mac-icon-btn !w-6 !h-6 dark:text-mac-secondary-label light:text-gray-500"
         >
           <X className="w-3.5 h-3.5" />
         </button>
@@ -210,41 +214,43 @@ export default function SessionItem({ session, isActive, onClick }: SessionItemP
       onClick={onClick}
       role="button"
       tabIndex={0}
+      title={getDisplayTitle(session)}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           onClick();
         }
       }}
-      className={`group w-full text-left px-3 py-2.5 flex items-start gap-3 transition-colors cursor-pointer
+      className={`group w-full mx-2 px-3 py-1.5 flex items-start gap-2 rounded-md transition-colors
         ${isActive
-          ? "bg-blue-900/50 border-l-2 border-blue-500"
-          : "hover:bg-gray-800/50 border-l-2 border-transparent"
+          ? "dark:bg-white/10 light:bg-black/10"
+          : "dark:hover:bg-white/5 light:hover:bg-black/5"
         }`}
+      style={{ width: "calc(100% - 16px)", minHeight: "28px" }}
     >
       <div className="mt-0.5 shrink-0">
-        <Icon className="w-4 h-4 text-gray-400" />
+        <Icon className="w-4 h-4 opacity-80 dark:text-mac-secondary-label light:text-gray-500" />
       </div>
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-sm font-medium text-gray-100 truncate">
+          <span className="text-[13px] leading-4 font-medium dark:text-mac-label light:text-black truncate">
             {getDisplayTitle(session)}
           </span>
-          <span className="text-xs text-gray-500 shrink-0">
+          <span className="text-[10px] dark:text-mac-tertiary-label light:text-gray-400 shrink-0">
             {formatRelativeTime(session.last_active)}
           </span>
         </div>
 
         <div className="flex items-center gap-2 mt-0.5">
-          <MessageSquare className="w-3 h-3 text-gray-500" />
-          <span className="text-xs text-gray-500">
+          <MessageSquare className="w-3 h-3 dark:text-mac-tertiary-label light:text-gray-400" />
+          <span className="text-[10px] dark:text-mac-tertiary-label light:text-gray-400">
             {session.message_count} {session.message_count === 1 ? "message" : "messages"}
           </span>
           {session.model && (
             <>
-              <span className="text-xs text-gray-600">·</span>
-              <span className="text-xs text-gray-500 truncate">{session.model}</span>
+              <span className="text-[10px] dark:text-mac-quaternary-label light:text-gray-300">·</span>
+              <span className="text-[10px] dark:text-mac-tertiary-label light:text-gray-400 truncate">{session.model}</span>
             </>
           )}
         </div>
@@ -255,14 +261,14 @@ export default function SessionItem({ session, isActive, onClick }: SessionItemP
         <button
           onClick={startEdit}
           title="Rename"
-          className="p-1 rounded text-gray-400 hover:text-blue-400 hover:bg-gray-700 transition-colors cursor-pointer"
+          className="mac-icon-btn !w-5 !h-5 dark:text-mac-secondary-label dark:hover:text-mac-blue light:text-gray-500 light:hover:text-blue-600"
         >
           <Pencil className="w-3 h-3" />
         </button>
         <button
           onClick={handleDeleteClick}
           title="Delete"
-          className="p-1 rounded text-gray-400 hover:text-red-400 hover:bg-gray-700 transition-colors cursor-pointer"
+          className="mac-icon-btn !w-5 !h-5 dark:text-mac-secondary-label dark:hover:text-mac-red light:text-gray-500 light:hover:text-red-500"
         >
           <Trash2 className="w-3 h-3" />
         </button>

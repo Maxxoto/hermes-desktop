@@ -70,40 +70,40 @@ export default function ForkDialog({ open, onClose, onForked }: ForkDialogProps)
       }}
     >
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-      <div className="relative w-full max-w-md mx-4 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl overflow-hidden">
-        <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-gray-800">
+      <div className="relative w-full max-w-md mx-4 rounded-lg dark:bg-mac-surface dark:border-white/[0.08] light:bg-white light:border-gray-200 border shadow-2xl overflow-hidden">
+        <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b dark:border-mac-separator light:border-gray-200">
           <div className="flex items-center gap-2">
-            <GitFork className="h-5 w-5 text-blue-400" />
-            <h2 className="text-base font-semibold text-gray-100">Fork Session</h2>
+            <GitFork className="h-5 w-5 dark:text-mac-blue light:text-blue-600" />
+            <h2 className="text-[15px] font-semibold dark:text-mac-label light:text-black">Fork Session</h2>
           </div>
-          <button onClick={onClose} className="p-1 rounded-md text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition-colors cursor-pointer">
+          <button onClick={onClose} className="mac-icon-btn !w-7 !h-7">
             <X className="h-4 w-4" />
           </button>
         </div>
         <div className="px-5 py-4 space-y-4">
-          <p className="text-sm text-gray-400 leading-relaxed">
+          <p className="text-[13px] dark:text-mac-secondary-label light:text-gray-600 leading-relaxed">
             Create a branch of this session. You can continue from here while keeping the original.
           </p>
           {candidates.length > 0 && (
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Fork at message</label>
+              <label className="text-[11px] font-medium dark:text-mac-tertiary-label light:text-gray-500 uppercase tracking-wide">Fork at message</label>
               <div className="max-h-60 overflow-y-auto space-y-1 pr-1">
                 {candidates.map((msg) => {
                   const isSelected = selectedIndex === msg.absoluteIndex;
                   return (
                     <button key={msg.id} onClick={() => setSelectedIndex(msg.absoluteIndex)}
-                      className={`w-full text-left flex items-start gap-3 px-3 py-2 rounded-lg border transition-colors cursor-pointer ${
-                        isSelected ? "border-blue-500 bg-blue-500/10" : "border-gray-700 bg-gray-800/50 hover:border-gray-600 hover:bg-gray-800"
+                      className={`w-full text-left flex items-start gap-3 px-3 py-2 rounded-md border transition-colors ${
+                        isSelected ? "border-blue-500 dark:bg-blue-500/10 light:bg-blue-500/5" : "dark:border-white/[0.08] dark:bg-white/[0.02] dark:hover:border-white/15 dark:hover:bg-white/5 light:border-gray-200 light:bg-gray-50 light:hover:border-gray-300 light:hover:bg-gray-100"
                       }`}>
-                      <span className={`mt-0.5 flex-shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${isSelected ? "border-blue-500" : "border-gray-600"}`}>
+                      <span className={`mt-0.5 flex-shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${isSelected ? "border-blue-500" : "dark:border-white/20 light:border-gray-300"}`}>
                         {isSelected && <span className="w-2 h-2 rounded-full bg-blue-500" />}
                       </span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className={`text-xs font-medium uppercase ${msg.role === "user" ? "text-blue-400" : "text-emerald-400"}`}>{msg.role}</span>
-                          <span className="text-[10px] text-gray-600">#{msg.absoluteIndex + 1}</span>
+                          <span className={`text-[11px] font-medium uppercase ${msg.role === "user" ? "dark:text-mac-blue light:text-blue-600" : "dark:text-mac-green light:text-green-600"}`}>{msg.role}</span>
+                          <span className="text-[10px] dark:text-mac-quaternary-label light:text-gray-300">#{msg.absoluteIndex + 1}</span>
                         </div>
-                        <p className="text-xs text-gray-300 truncate mt-0.5">{previewContent(msg.content)}</p>
+                        <p className="text-[11px] dark:text-mac-secondary-label light:text-gray-600 truncate mt-0.5">{previewContent(msg.content)}</p>
                       </div>
                     </button>
                   );
@@ -112,23 +112,23 @@ export default function ForkDialog({ open, onClose, onForked }: ForkDialogProps)
             </div>
           )}
           {candidates.length === 0 && (
-            <div className="flex items-center gap-2 text-sm text-gray-500 py-2">
+            <div className="flex items-center gap-2 text-[13px] dark:text-mac-tertiary-label light:text-gray-400 py-2">
               <AlertCircle className="h-4 w-4" />
               <span>No messages to select as fork point.</span>
             </div>
           )}
           {error && (
-            <div className="flex items-start gap-2 p-3 rounded-lg bg-red-900/20 border border-red-800/50">
-              <AlertCircle className="h-4 w-4 text-red-400 mt-0.5 flex-shrink-0" />
-              <p className="text-sm text-red-300">{error}</p>
+            <div className="flex items-start gap-2 p-3 rounded-md dark:bg-mac-red/10 light:bg-red-500/10 border dark:border-mac-red/30 light:border-red-500/30">
+              <AlertCircle className="h-4 w-4 dark:text-mac-red light:text-red-500 mt-0.5 flex-shrink-0" />
+              <p className="text-[13px] dark:text-mac-red light:text-red-500">{error}</p>
             </div>
           )}
         </div>
-        <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-800 bg-gray-900/80">
+        <div className="flex items-center justify-end gap-2 px-5 py-4 border-t dark:border-mac-separator dark:bg-white/[0.02] light:border-gray-200 light:bg-gray-50">
           <button onClick={onClose} disabled={forking}
-            className="px-4 py-2 text-sm font-medium text-gray-300 rounded-lg hover:bg-gray-800 hover:text-gray-100 transition-colors disabled:opacity-50 cursor-pointer">Cancel</button>
+            className="mac-btn disabled:opacity-50">Cancel</button>
           <button onClick={handleFork} disabled={forking || !sessionId || candidates.length === 0}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+            className="mac-btn mac-btn-primary flex items-center gap-1.5 disabled:opacity-50">
             {forking ? (
               <><svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />

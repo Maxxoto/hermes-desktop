@@ -49,7 +49,7 @@ function RootLayout() {
 
 function Layout() {
   return (
-    <div className="flex flex-col h-screen bg-gray-950">
+    <div className="flex flex-col h-screen dark:bg-mac-window light:bg-[#ECECEC]">
       <ReAuthBanner />
       <Outlet />
       <StatusBar />

@@ -35,7 +35,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
   };
 
   return (
-    <div className="border-t border-gray-700/60 bg-gray-900/80 backdrop-blur-sm px-4 py-3">
+    <div className="border-t dark:border-mac-separator light:border-gray-200 dark:bg-mac-content light:bg-white px-5 py-3">
       <div className="flex items-end gap-2 max-w-4xl mx-auto">
         <textarea
           ref={textareaRef}
@@ -45,9 +45,11 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           placeholder="Type a message…"
           rows={1}
           className={cn(
-            "flex-1 resize-none rounded-xl border border-gray-700 bg-gray-800 px-4 py-2.5",
-            "text-sm text-gray-100 placeholder-gray-500",
-            "focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50",
+            "flex-1 resize-none rounded-lg border px-3.5 py-2.5",
+            "text-[13px] leading-4 min-h-[44px]",
+            "dark:bg-white/5 dark:border-white/10 dark:text-mac-label dark:placeholder:text-mac-tertiary-label",
+            "light:bg-black/5 light:border-black/10 light:text-black light:placeholder:text-gray-400",
+            "focus:outline-none focus:border-[var(--mac-accent)] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]",
             "transition-colors",
             disabled && "opacity-50 cursor-not-allowed"
           )}
@@ -55,13 +57,16 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
         <button
           onClick={handleSend}
           disabled={disabled}
+          title="Send"
           className={cn(
-            "flex-shrink-0 rounded-xl p-2.5 transition-all",
-            "bg-blue-600 hover:bg-blue-500 text-white",
-            "disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-blue-600"
+            "flex-shrink-0 flex items-center justify-center",
+            "w-8 h-8 rounded-full transition-all",
+            "bg-[var(--mac-accent)] text-white",
+            "hover:opacity-90 active:opacity-80",
+            "disabled:opacity-30 disabled:cursor-not-allowed"
           )}
         >
-          <Send className="h-5 w-5" />
+          <Send className="h-4 w-4" />
         </button>
       </div>
     </div>

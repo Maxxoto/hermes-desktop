@@ -251,18 +251,16 @@ export default function ChatPage() {
   }, [navigate]);
 
   return (
-    <div className="flex flex-1 min-h-0 bg-gray-950 text-gray-100 overflow-hidden">
+    <div className="flex flex-1 min-h-0 dark:bg-mac-content light:bg-white dark:text-mac-label light:text-black overflow-hidden">
       {/* Sidebar — hidden on mobile, overlay when toggled */}
-      <aside className={`
+      <aside className={`sidebar vibrancy-sidebar
         fixed inset-0 z-50 md:static md:z-auto
-        md:w-64 md:flex-shrink-0 md:border-r md:border-gray-800 md:bg-gray-900/50
-        bg-gray-900/95 backdrop-blur-sm
+        md:w-60 md:flex-shrink-0 md:border-r md:dark:border-mac-separator md:light:border-gray-200
         flex flex-col transition-transform duration-200
-        ${showSidebar ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
-      `}>
-        <div className="flex items-center justify-between px-3 pt-3 pb-1 md:hidden">
-          <span className="text-sm font-semibold text-gray-300">Sessions</span>
-          <button onClick={() => setShowSidebar(false)} className="p-1.5 rounded-lg text-gray-500 hover:text-gray-200 hover:bg-gray-800 transition-colors cursor-pointer">
+        ${showSidebar ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+        <div className="flex items-center justify-between px-4 pt-3 pb-1 md:hidden">
+          <span className="text-[13px] font-semibold dark:text-mac-secondary-label light:text-gray-600">Sessions</span>
+          <button onClick={() => setShowSidebar(false)} className="mac-icon-btn">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -279,18 +277,18 @@ export default function ChatPage() {
 
       {/* Main chat area */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Toolbar */}
-        <header className="flex items-center justify-between px-2 sm:px-5 py-2 sm:py-3 border-b border-gray-800 bg-gray-900/60 backdrop-blur-sm min-h-[48px]">
+        {/* Toolbar — vibrancy */}
+        <header className="toolbar vibrancy-toolbar flex items-center justify-between px-2 sm:px-4 border-b dark:border-mac-separator light:border-gray-200 min-h-[44px]">
           <div className="flex items-center gap-2 min-w-0">
             <button
               onClick={() => setShowSidebar(true)}
-              className="p-1.5 rounded-lg text-gray-500 hover:text-gray-200 hover:bg-gray-800 transition-colors cursor-pointer md:hidden"
+              className="mac-icon-btn md:hidden"
               title="Open sessions"
             >
               <Menu className="h-4 w-4" />
             </button>
-            <MessageSquare className="h-4 w-4 text-blue-400 flex-shrink-0 hidden sm:block" />
-            <span className="text-sm font-medium truncate">
+            <MessageSquare className="h-4 w-4 dark:text-mac-blue light:text-blue-600 flex-shrink-0 hidden sm:block" />
+            <span className="text-[13px] font-medium truncate">
               {sessionId
                 ? `Session ${sessionId.slice(0, 8)}…`
                 : "New Chat"}
@@ -301,7 +299,7 @@ export default function ChatPage() {
             <button
               onClick={() => setShowForkDialog(true)}
               title="Fork session"
-              className="p-1.5 rounded-lg text-gray-500 hover:text-gray-200 hover:bg-gray-800 transition-colors cursor-pointer"
+              className="mac-icon-btn"
               disabled={!sessionId}
             >
               <GitFork className="h-4 w-4" />
@@ -317,7 +315,7 @@ export default function ChatPage() {
             <button
               onClick={toggleTheme}
               title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-              className="p-1.5 rounded-lg text-gray-500 hover:text-gray-200 hover:bg-gray-800 transition-colors cursor-pointer"
+              className="mac-icon-btn"
             >
               {theme === "dark" ? (
                 <Sun className="h-4 w-4" />
@@ -328,7 +326,7 @@ export default function ChatPage() {
             <button
               onClick={handleLogout}
               title="Disconnect and go back"
-              className="p-1.5 rounded-lg text-gray-500 hover:text-gray-200 hover:bg-gray-800 transition-colors cursor-pointer"
+              className="mac-icon-btn"
             >
               <LogOut className="h-4 w-4" />
             </button>
@@ -342,12 +340,12 @@ export default function ChatPage() {
         />
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-2 sm:px-4 py-2 sm:py-4">
+        <div className="flex-1 overflow-y-auto message-content px-2 sm:px-4 py-2 sm:py-4">
           <div className="max-w-3xl mx-auto">
             {messages.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-full text-gray-600 min-h-[60vh]">
+              <div className="flex flex-col items-center justify-center h-full dark:text-mac-tertiary-label light:text-gray-400 min-h-[60vh]">
                 <MessageSquare className="h-10 w-10 sm:h-12 sm:w-12 mb-3 opacity-40" />
-                <p className="text-sm">Start a conversation</p>
+                <p className="text-[13px]">Start a conversation</p>
               </div>
             )}
             {messages.map((msg) => (
@@ -360,13 +358,13 @@ export default function ChatPage() {
         {/* Input */}
         <div className="flex items-end gap-2">
           {isStreaming && (
-            <div className="flex-shrink-0 pb-3 pl-4">
+            <div className="flex-shrink-0 pb-3 pl-5">
               <button
                 onClick={handleStopGeneration}
                 title="Stop generation"
-                className="p-2.5 rounded-xl bg-gray-700 hover:bg-red-600 text-gray-300 hover:text-white transition-colors cursor-pointer"
+                className="mac-icon-btn !w-9 !h-9 dark:hover:!bg-mac-red/20 dark:hover:text-mac-red light:hover:!bg-red-500/20 light:hover:text-red-500"
               >
-                <Square className="h-5 w-5" />
+                <Square className="h-4 w-4" />
               </button>
             </div>
           )}

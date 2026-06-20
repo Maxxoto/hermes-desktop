@@ -13,14 +13,19 @@ function getInitialTheme(): Theme {
 }
 
 /**
- * Apply theme by toggling the `dark` class on <html>.
- * Tailwind's `dark:` variant is keyed off this class.
+ * Apply theme by toggling `dark` / `light` classes on <html>.
+ *
+ * Tailwind v4 `dark:` variant is keyed off `.dark`; the `light:` custom variant
+ * (declared in index.css) keys off `.light`. Both classes are managed so that
+ * light-mode-specific tokens (see :root.light in index.css) activate correctly.
  */
 function applyTheme(theme: Theme) {
   const root = document.documentElement;
   if (theme === "dark") {
     root.classList.add("dark");
+    root.classList.remove("light");
   } else {
+    root.classList.add("light");
     root.classList.remove("dark");
   }
 }
