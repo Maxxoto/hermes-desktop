@@ -384,7 +384,7 @@ export default function ChatPage() {
             {/* Mobile menu button */}
             <button
               onClick={() => setShowSidebar(true)}
-              className="mac-icon-btn !md:hidden"
+              className="mac-icon-btn toolbar-hide-mobile"
               title="Open sessions"
               aria-label="Open sessions"
             >
@@ -393,7 +393,7 @@ export default function ChatPage() {
             {/* Desktop sidebar collapse toggle */}
             <button
               onClick={toggleSidebarCollapsed}
-              className="mac-icon-btn !hidden !md:flex"
+              className="mac-icon-btn toolbar-show-desktop"
               title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
               aria-label="Toggle sidebar"
             >

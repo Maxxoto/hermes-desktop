@@ -425,7 +425,6 @@ input[type="email"], textarea, [contenteditable] { cursor: text; }
 
 /* ---- Toolbar Icon Button ------------------------------------------------ */
 .mac-icon-btn {
-  display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 32px;
@@ -518,4 +517,14 @@ input[type="email"], textarea, [contenteditable] { cursor: text; }
 }
 .glow-red {
   box-shadow: 0 0 12px rgba(255, 69, 58, 0.5);
+}
+
+/* ---- Toolbar responsive — bypass Tailwind CSS layer issues ---------- */
+@media (min-width: 768px) {
+  .toolbar-hide-mobile { display: none !important; }
+  .toolbar-show-desktop { display: inline-flex !important; }
+}
+@media (max-width: 767px) {
+  .toolbar-hide-mobile { display: inline-flex !important; }
+  .toolbar-show-desktop { display: none !important; }
 }
