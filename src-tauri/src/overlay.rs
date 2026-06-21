@@ -1,18 +1,18 @@
-use tauri::{AppHandle, Manager};
+use tauri::{App, Manager};
 
 /// Register the global shortcut for toggling the overlay window.
 /// Uses Ctrl+Shift+Space (Linux) / Cmd+Shift+Space (macOS).
-pub fn register_shortcut(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
-    let app_handle = app.clone();
+pub fn register_shortcut(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
+    let app_handle = app.handle().clone();
 
     // Use the global-shortcut plugin API
     use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut};
 
     // Build the shortcut: Cmd+Shift+Space on macOS, Ctrl+Shift+Space elsewhere
     #[cfg(target_os = "macos")]
-    let shortcut = Shortcut::new(Some(Modifiers::META | Modifiers::SHIFT), Code::Space)?;
+    let shortcut = Shortcut::new(Some(Modifiers::META | Modifiers::SHIFT), Code::Space);
     #[cfg(not(target_os = "macos"))]
-    let shortcut = Shortcut::new(Some(Modifiers::CONTROL | Modifiers::SHIFT), Code::Space)?;
+    let shortcut = Shortcut::new(Some(Modifiers::CONTROL | Modifiers::SHIFT), Code::Space);
 
     app.global_shortcut()
         .on_shortcut(shortcut, move |_app, _shortcut, event| {
