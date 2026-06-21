@@ -1,4 +1,4 @@
-use tauri::{App, Manager};
+use tauri::{App, AppHandle, Manager};
 
 /// Register the global shortcut for toggling the overlay window.
 /// Uses Ctrl+Shift+Space (Linux) / Cmd+Shift+Space (macOS).
@@ -31,10 +31,10 @@ pub fn toggle_overlay(app: &AppHandle) -> Result<(), String> {
         .ok_or("overlay window not found")?;
 
     if overlay.is_visible().unwrap_or(false) {
-        overlay.hide().map_err(|e| e.to_string())?;
+        overlay.hide().map_err(|e: tauri::Error| e.to_string())?;
     } else {
-        overlay.show().map_err(|e| e.to_string())?;
-        overlay.set_focus().map_err(|e| e.to_string())?;
+        overlay.show().map_err(|e: tauri::Error| e.to_string())?;
+        overlay.set_focus().map_err(|e: tauri::Error| e.to_string())?;
     }
 
     Ok(())
