@@ -32,6 +32,9 @@ import { useFileUpload } from "../files/use-file-upload";
 import DropZone from "../files/DropZone";
 import { useSpaceShortcuts } from "../../hooks/use-space-shortcuts";
 import { useSpaces } from "../spaces/use-spaces";
+import TodayView from "../today/TodayView";
+import { useTodayStore } from "../today/use-today-store";
+import { useTodayShortcut } from "../../hooks/use-today-shortcut";
 
 export default function ChatPage() {
   const navigate = useNavigate();
@@ -344,6 +347,19 @@ export default function ChatPage() {
     [setSession, loadFromSession]
   );
 
+  // ── Today view (EPIC 12) ────────────────────────────────────────────────
+  const showTodayView = useTodayStore((s) => s.showTodayView);
+  const toggleTodayView = useTodayStore((s) => s.toggleTodayView);
+  useTodayShortcut(toggleTodayView);
+
+  const handleOpenSessionFromToday = useCallback(
+    async (id: string) => {
+      toggleTodayView(); // close today view
+      handleSelectSession(id);
+    },
+    [toggleTodayView, handleSelectSession]
+  );
+
   const handleNewSession = useCallback(() => {
     clear();
   }, [clear]);
@@ -623,9 +639,11 @@ export default function ChatPage() {
         <div className="fixed inset-0 z-40 bg-black/50 md:hidden" onClick={() => setShowSidebar(false)} />
       )}
 
-      {/* Main chat area */}
+      {/* Main chat area — Today view replaces content when active */}
       <div className="flex-1 flex flex-col min-w-0">
-        {splitView ? (
+        {showTodayView ? (
+          <TodayView onOpenSession={handleOpenSessionFromToday} />
+        ) : splitView ? (
           <SplitView
             onClose={toggleSplitView}
             leftPanel={primaryChatPanel}
