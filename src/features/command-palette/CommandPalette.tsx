@@ -41,6 +41,7 @@ export interface CommandPaletteProps {
     onCopySessionId: () => void;
     onGoToSettings: () => void;
     onGoToCurrentSession: () => void;
+    onToggleOverlay: () => void;
     onSelectSession: (id: string) => void;
   };
 }
@@ -118,6 +119,9 @@ export function CommandPalette({
           break;
         case "settings":
           actions.onGoToSettings();
+          break;
+        case "overlay":
+          actions.onToggleOverlay();
           break;
         case "focus":
           actions.onGoToCurrentSession();
@@ -273,8 +277,7 @@ export function CommandPalette({
                 value="overlay"
                 icon={<Sparkles className="w-4 h-4" />}
                 label="Toggle Overlay"
-                shortcut="⌘."
-                disabled
+                shortcut="⌘⇧Space"
                 onSelect={handleSelect}
               />
               <ActionRow

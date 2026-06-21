@@ -39,3 +39,9 @@ pub fn toggle_overlay(app: &AppHandle) -> Result<(), String> {
 
     Ok(())
 }
+
+/// Tauri command wrapper so the main window JS can toggle the overlay.
+#[tauri::command]
+pub fn toggle_overlay_command(app: AppHandle) -> Result<(), String> {
+    toggle_overlay(&app)
+}

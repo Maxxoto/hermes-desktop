@@ -1,3 +1,5 @@
+import { useCallback } from "react";
+import { Sparkles } from "lucide-react";
 import { useGatewayHealth } from "./use-gateway-health";
 
 const isConnected = (status: string) =>
@@ -8,6 +10,15 @@ export default function StatusBar() {
 
   const connected =
     !isLoading && !isError && data !== undefined && isConnected(data.status);
+
+  const toggleOverlay = useCallback(async () => {
+    try {
+      const { invoke } = await import("@tauri-apps/api/core");
+      await invoke("toggle_overlay_command");
+    } catch {
+      // Not in Tauri (browser dev mode) — ignore
+    }
+  }, []);
 
   return (
     <footer role="status" className="flex items-center justify-between vibrancy-statusbar px-5 text-[11px] dark:text-mac-secondary-label light:text-gray-500"
@@ -38,8 +49,16 @@ export default function StatusBar() {
         )}
       </div>
 
-      {/* Right — Sessions + version */}
+      {/* Right — Overlay toggle + Sessions + version */}
       <div className="flex items-center gap-4">
+        <button
+          onClick={toggleOverlay}
+          title="Toggle Overlay (⌘⇧Space)"
+          className="flex items-center gap-1 dark:text-mac-tertiary-label light:text-gray-400 hover:dark:text-mac-label hover:light:text-black transition-colors"
+        >
+          <Sparkles className="h-3 w-3" />
+          Overlay
+        </button>
         {data && (
           <span className="dark:text-mac-tertiary-label light:text-gray-400">
             {data.activeSessions} active session

@@ -121,8 +121,9 @@ pub fn run() {
 
             // Build tray menu
             let show = MenuItem::with_id(app, "show", "Show Hermes", true, None::<&str>)?;
+            let overlay_item = MenuItem::with_id(app, "overlay", "Toggle Overlay", true, None::<&str>)?;
             let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
-            let menu = Menu::with_items(app, &[&show, &quit])?;
+            let menu = Menu::with_items(app, &[&show, &overlay_item, &quit])?;
 
             // Load tray icon
             let icon_bytes = include_bytes!("../icons/icon.png");
@@ -139,6 +140,9 @@ pub fn run() {
                                 let _ = window.set_focus();
                             }
                         }
+                        "overlay" => {
+                            let _ = overlay::toggle_overlay(app);
+                        }
                         "quit" => {
                             app.exit(0);
                         }
@@ -154,7 +158,7 @@ pub fn run() {
                 let _ = window.hide();
             }
         })
-        .invoke_handler(tauri::generate_handler![store_credentials, load_credentials, snap::snap_window])
+        .invoke_handler(tauri::generate_handler![store_credentials, load_credentials, snap::snap_window, overlay::toggle_overlay_command])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

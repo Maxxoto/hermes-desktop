@@ -139,6 +139,15 @@ export default function ChatPage() {
     navigate("/connection?edit=1");
   }, [navigate]);
 
+  const handlePaletteToggleOverlay = useCallback(async () => {
+    try {
+      const { invoke } = await import("@tauri-apps/api/core");
+      await invoke("toggle_overlay_command");
+    } catch {
+      // Not in Tauri (browser dev mode) — ignore
+    }
+  }, []);
+
   const handlePaletteGoCurrent = useCallback(() => {
     const input = document.querySelector<HTMLInputElement>(
       "textarea[data-chat-input], input[data-chat-input]"
@@ -420,6 +429,7 @@ export default function ChatPage() {
       onCopySessionId: handlePaletteCopyId,
       onGoToSettings: handlePaletteGoSettings,
       onGoToCurrentSession: handlePaletteGoCurrent,
+      onToggleOverlay: handlePaletteToggleOverlay,
       onSelectSession: handleSelectSession,
     }),
     [
@@ -430,6 +440,7 @@ export default function ChatPage() {
       handlePaletteCopyId,
       handlePaletteGoSettings,
       handlePaletteGoCurrent,
+      handlePaletteToggleOverlay,
       handleSelectSession,
     ],
   );
