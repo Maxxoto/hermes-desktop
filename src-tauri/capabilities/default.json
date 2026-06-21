@@ -9,6 +9,6 @@
     "notification:default",
     "deep-link:default",
     "global-shortcut:default",
-    "webview:default"
+    "core:webview:default"
   ]
 }
