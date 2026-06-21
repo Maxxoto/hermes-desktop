@@ -434,7 +434,7 @@ export default function CompactChat({
     >
       {/* Header bar — drag region + controls */}
       <div
-        className="flex items-center justify-between px-3 py-2"
+        className="flex items-center justify-between px-3 py-2 flex-shrink-0"
         style={{
           background: "var(--mac-toolbar)",
           borderBottom: "1px solid var(--mac-separator)",
@@ -608,7 +608,7 @@ export default function CompactChat({
 
       {/* Input area */}
       <div
-        className="px-3 py-2 flex flex-col gap-1.5"
+        className="px-3 py-2 flex flex-col gap-1.5 flex-shrink-0"
         style={{
           borderTop: "1px solid var(--mac-separator)",
           background: "var(--mac-toolbar)",

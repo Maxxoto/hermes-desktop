@@ -31,7 +31,7 @@ export default function OverlayApp() {
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center"
+      className="fixed inset-0 flex items-center justify-center overflow-hidden"
       style={{ background: "transparent" }}
     >
       {view === "settings" ? (

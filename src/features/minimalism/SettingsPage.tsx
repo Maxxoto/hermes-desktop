@@ -291,7 +291,7 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
     >
       {/* Header */}
       <div
-        className="flex items-center px-3 py-2"
+        className="flex items-center px-3 py-2 flex-shrink-0"
         style={{
           background: "var(--mac-toolbar)",
           borderBottom: "1px solid var(--mac-separator)",
