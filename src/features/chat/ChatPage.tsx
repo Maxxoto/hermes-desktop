@@ -32,6 +32,8 @@ import { useFileUpload } from "../files/use-file-upload";
 import DropZone from "../files/DropZone";
 import { useSpaceShortcuts } from "../../hooks/use-space-shortcuts";
 import { useSpaces } from "../spaces/use-spaces";
+import { useQuickAccess } from "../quick-access/use-quick-access";
+import { QuickAccessCard } from "../quick-access/QuickAccessCard";
 import TodayView from "../today/TodayView";
 import { useTodayStore } from "../today/use-today-store";
 import { useTodayShortcut } from "../../hooks/use-today-shortcut";
@@ -97,6 +99,9 @@ export default function ChatPage() {
 
   // File attachments
   const { files, addFiles, removeFile, clearFiles } = useFileUpload();
+
+  // Quick Access — evaluates assistant responses for code blocks, screenshots, etc.
+  const quickAccess = useQuickAccess();
 
   // Sessions for the command palette
   const { data: paletteSessions = [] } = useSessions();
@@ -360,6 +365,17 @@ export default function ChatPage() {
   const showTodayView = useTodayStore((s) => s.showTodayView);
   const toggleTodayView = useTodayStore((s) => s.toggleTodayView);
   useTodayShortcut(toggleTodayView);
+
+  // ── Quick Access — evaluate assistant responses when streaming completes ──
+  const { isStreaming: _isStreaming, messages: _messages } = useChatStore();
+  useEffect(() => {
+    if (!_isStreaming && _messages.length > 0) {
+      const lastMsg = _messages[_messages.length - 1];
+      if (lastMsg.role === "assistant" && lastMsg.content) {
+        quickAccess.evaluateResponse(lastMsg.content);
+      }
+    }
+  }, [_isStreaming, _messages, quickAccess]);
 
   const handleOpenSessionFromToday = useCallback(
     async (id: string) => {
@@ -681,6 +697,35 @@ export default function ChatPage() {
         currentSessionId={sessionId}
         actions={paletteActions}
       />
+
+      {/* Quick Access Card — shows when assistant response contains code/screenshot/error */}
+      {quickAccess.item && (
+        <QuickAccessCard
+          content={quickAccess.item.content}
+          contentType={quickAccess.item.contentType}
+          preview={quickAccess.item.preview}
+          visible={quickAccess.visible}
+          onDismiss={quickAccess.dismiss}
+          onCopy={async (content) => {
+            try { await navigator.clipboard.writeText(content); } catch {}
+          }}
+          onSave={(content) => {
+            const blob = new Blob([content], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "snippet.txt";
+            a.click();
+            URL.revokeObjectURL(url);
+          }}
+          onBookmark={(content) => {
+            // Use the bookmark store from blocks
+            import("../blocks/use-bookmarks").then(({ useBookmarkStore }) => {
+              useBookmarkStore.getState().addBookmark(content, "current");
+            });
+          }}
+        />
+      )}
     </div>
   );
 }

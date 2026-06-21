@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import CompactChat from "./CompactChat";
 import SettingsPage from "./SettingsPage";
+import { useWindowSnap } from "./use-window-snap";
 
 /**
  * OverlayApp — Standalone React root for the overlay window.
@@ -9,6 +10,9 @@ import SettingsPage from "./SettingsPage";
  */
 export default function OverlayApp() {
   const [view, setView] = useState<"chat" | "settings">("chat");
+
+  // Enable window snapping shortcuts (⌘⌥+arrow keys)
+  useWindowSnap();
 
   const handleKeyDown = useCallback(async (e: KeyboardEvent) => {
     if (e.key === "Escape") {
