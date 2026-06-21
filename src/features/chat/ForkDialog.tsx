@@ -69,9 +69,9 @@ export default function ForkDialog({ open, onClose, onForked }: ForkDialogProps)
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-      <div className="relative w-full max-w-md mx-4 rounded-lg dark:bg-mac-surface dark:border-white/[0.08] light:bg-white light:border-gray-200 border shadow-2xl overflow-hidden">
-        <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b dark:border-mac-separator light:border-gray-200">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-md" />
+      <div className="relative w-full max-w-md mx-4 rounded-xl glass-surface overflow-hidden">
+        <div className="flex items-center justify-between px-5 pt-5 pb-3 glass-border-b">
           <div className="flex items-center gap-2">
             <GitFork className="h-5 w-5 dark:text-mac-blue light:text-blue-600" />
             <h2 className="text-[15px] font-semibold dark:text-mac-label light:text-black">Fork Session</h2>
@@ -124,7 +124,7 @@ export default function ForkDialog({ open, onClose, onForked }: ForkDialogProps)
             </div>
           )}
         </div>
-        <div className="flex items-center justify-end gap-2 px-5 py-4 border-t dark:border-mac-separator dark:bg-white/[0.02] light:border-gray-200 light:bg-gray-50">
+        <div className="flex items-center justify-end gap-2 px-5 py-4 glass-border-t">
           <button onClick={onClose} disabled={forking}
             className="mac-btn disabled:opacity-50">Cancel</button>
           <button onClick={handleFork} disabled={forking || !sessionId || candidates.length === 0}

@@ -17,6 +17,19 @@
         "height": 750,
         "minWidth": 800,
         "minHeight": 500
+      },
+      {
+        "label": "overlay",
+        "title": "Hermes",
+        "width": 400,
+        "height": 300,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "visible": false,
+        "center": true,
+        "resizable": false
       }
     ],
     "security": {
@@ -25,7 +38,10 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["dmg", "app"],
+    "targets": [
+      "dmg",
+      "app"
+    ],
     "macOS": {
       "minimumSystemVersion": "11.0",
       "signingIdentity": "Developer ID Application: Ahmat Dani (TEAM_ID_PLACEHOLDER)"
@@ -39,16 +55,10 @@
     ]
   },
   "plugins": {
-    "updater": {
-      "active": true,
-      "endpoints": [
-        "https://releases.example.com/hermes-desktop/{{target}}/{{arch}}/{{current_version}}"
-      ],
-      "pubKey": "UPDATER_PUBKEY_PLACEHOLDER_REPLACE_WITH_REAL_KEY",
-      "dialog": true
-    },
     "deep-link": {
-      "desktopSchemes": ["hermes"]
+      "desktopSchemes": [
+        "hermes"
+      ]
     }
   }
 }

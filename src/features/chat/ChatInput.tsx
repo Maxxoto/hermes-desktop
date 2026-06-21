@@ -1,14 +1,26 @@
 import { type KeyboardEvent, useRef } from "react";
-import { Send } from "lucide-react";
+import { Send, Paperclip } from "lucide-react";
 import { cn } from "../../lib/utils";
+import type { AttachedFile } from "../files/use-file-upload";
+import AttachmentChip from "../files/AttachmentChip";
 
 interface ChatInputProps {
   onSend: (text: string) => void;
   disabled?: boolean;
+  files?: AttachedFile[];
+  onFiles?: (files: FileList) => void;
+  onRemoveFile?: (id: string) => void;
 }
 
-export function ChatInput({ onSend, disabled }: ChatInputProps) {
+export function ChatInput({
+  onSend,
+  disabled,
+  files,
+  onFiles,
+  onRemoveFile,
+}: ChatInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSend = () => {
     const el = textareaRef.current;
@@ -35,8 +47,40 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
   };
 
   return (
-    <div className="border-t dark:border-mac-separator light:border-gray-200 dark:bg-mac-content light:bg-white px-5 py-3">
-      <div className="flex items-end gap-2 max-w-4xl mx-auto">
+    <div
+      className="glass-border-t px-5 py-4"
+      style={{ background: "var(--mac-toolbar)" }}
+    >
+      {/* Attachment chips */}
+      {files && files.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 pb-2">
+          {files.map((f) => (
+            <AttachmentChip key={f.id} file={f} onRemove={onRemoveFile!} />
+          ))}
+        </div>
+      )}
+      <div className="flex items-end gap-3 max-w-4xl mx-auto">
+        {/* File picker button */}
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          title="Attach files"
+          aria-label="Attach files"
+          className="flex-shrink-0 mac-icon-btn !w-8 !h-8 dark:text-mac-tertiary-label light:text-gray-400"
+          disabled={disabled}
+        >
+          <Paperclip className="h-4 w-4" />
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept="image/*,.pdf,.txt,.md,.json,.csv,.py,.js,.ts,.tsx,.go,.rs,.yaml,.yml,.toml"
+          className="hidden"
+          onChange={(e) => {
+            if (e.target.files) onFiles?.(e.target.files);
+            e.target.value = "";
+          }}
+        />
         <textarea
           ref={textareaRef}
           onInput={handleInput}
@@ -45,25 +89,28 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           placeholder="Type a message…"
           rows={1}
           className={cn(
-            "flex-1 resize-none rounded-lg border px-3.5 py-2.5",
-            "text-[13px] leading-4 min-h-[44px]",
-            "dark:bg-white/5 dark:border-white/10 dark:text-mac-label dark:placeholder:text-mac-tertiary-label",
-            "light:bg-black/5 light:border-black/10 light:text-black light:placeholder:text-gray-400",
-            "focus:outline-none focus:border-[var(--mac-accent)] focus:shadow-[0_0_0_3px_rgba(10,132,255,0.25)]",
-            "transition-colors",
-            disabled && "opacity-50 cursor-not-allowed"
+            "flex-1 resize-none rounded-xl px-4 py-3",
+            "text-[13px] leading-5 min-h-[44px]",
+            "glass-input",
+            "dark:text-mac-label dark:placeholder:text-mac-tertiary-label",
+            "light:text-black light:placeholder:text-gray-400",
+            "focus:outline-none",
+            disabled && "opacity-50 cursor-not-allowed",
           )}
         />
         <button
           onClick={handleSend}
           disabled={disabled}
           title="Send"
+          aria-label="Send message"
           className={cn(
             "flex-shrink-0 flex items-center justify-center",
-            "w-8 h-8 rounded-full transition-all",
-            "bg-[var(--mac-accent)] text-white",
-            "hover:opacity-90 active:opacity-80",
-            "disabled:opacity-30 disabled:cursor-not-allowed"
+            "w-9 h-9 rounded-full",
+            "send-btn-glass",
+            "text-white",
+            "transition-all duration-150",
+            "active:scale-[0.92]",
+            "disabled:opacity-30 disabled:cursor-not-allowed disabled:transform-none",
           )}
         >
           <Send className="h-4 w-4" />

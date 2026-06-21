@@ -8,6 +8,11 @@ use tauri::{
     AppHandle, Manager, WindowEvent,
 };
 
+// Module for overlay window management
+mod overlay;
+// Module for window snapping (Rectangle-style)
+mod snap;
+
 const SERVICE_NAME: &str = "hermes-desktop";
 const KEY_URL: &str = "gateway_url";
 const KEY_API_KEY: &str = "api_key";
@@ -108,24 +113,28 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_notification::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_deep_link::init())
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .setup(|app| {
+            // Register overlay toggle shortcut
+            overlay::register_shortcut(app)?;
+
             // Build tray menu
             let show = MenuItem::with_id(app, "show", "Show Hermes", true, None::<&str>)?;
             let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
             let menu = Menu::with_items(app, &[&show, &quit])?;
 
             // Load tray icon
-            if let Ok(icon) = Image::from_bytes(include_bytes!("../icons/icon.png")) {
+            let icon_bytes = include_bytes!("../icons/icon.png");
+            if let Ok(icon) = Image::from_bytes(icon_bytes) {
                 TrayIconBuilder::new()
                     .icon(icon)
                     .tooltip("Hermes Desktop")
                     .menu(&menu)
-                    .on_menu_event(|app, event| match event.id.as_ref() {
+                    .on_menu_event(|app: &AppHandle, event| match event.id.as_ref() {
                         "show" => {
                             if let Some(window) = app.get_webview_window("main") {
-                                let _ = window.unminimize();
+                                let _: Result<(), tauri::Error> = window.unminimize();
                                 let _ = window.show();
                                 let _ = window.set_focus();
                             }
@@ -145,7 +154,7 @@ pub fn run() {
                 let _ = window.hide();
             }
         })
-        .invoke_handler(tauri::generate_handler![store_credentials, load_credentials,])
+        .invoke_handler(tauri::generate_handler![store_credentials, load_credentials, snap::snap_window])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

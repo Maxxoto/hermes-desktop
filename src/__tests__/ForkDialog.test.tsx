@@ -224,7 +224,7 @@ describe("ForkDialog", () => {
 
     // The X close button is in the header next to the title
     // Find buttons inside the header (first border-b section)
-    const header = container.querySelector(".border-b");
+    const header = container.querySelector(".glass-border-b");
     const closeBtn = header?.querySelector("button");
     expect(closeBtn).toBeTruthy();
     await user.click(closeBtn!);

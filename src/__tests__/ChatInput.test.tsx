@@ -29,7 +29,7 @@ describe("ChatInput", () => {
 
   it("renders a send button", () => {
     render(<ChatInput onSend={onSend} />);
-    expect(screen.getByRole("button")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Send message" })).toBeInTheDocument();
   });
 
   // ---- Submit on Enter -----------------------------------------------------
@@ -102,7 +102,7 @@ describe("ChatInput", () => {
     render(<ChatInput onSend={onSend} />);
 
     await user.type(screen.getByPlaceholderText("Type a message…"), "Button send");
-    await user.click(screen.getByRole("button"));
+    await user.click(screen.getByRole("button", { name: "Send message" }));
 
     expect(onSend).toHaveBeenCalledWith("Button send");
   });
@@ -111,9 +111,8 @@ describe("ChatInput", () => {
 
   it("disables textarea and button when disabled prop is true", () => {
     render(<ChatInput onSend={onSend} disabled />);
-
     expect(screen.getByPlaceholderText("Type a message…")).toBeDisabled();
-    expect(screen.getByRole("button")).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Send message" })).toBeDisabled();
   });
 
   it("does not call onSend when disabled and Enter pressed", () => {

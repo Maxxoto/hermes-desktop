@@ -65,6 +65,23 @@ export interface ForkResult {
   id: string;
 }
 
+// --- Agent / Model info types -----------------------------------------------
+
+/** Agent info from Gateway */
+export interface AgentInfo {
+  id: string;
+  name: string;
+  description?: string;
+  model?: string;
+}
+
+/** Model info from Gateway */
+export interface ModelInfo {
+  id: string;
+  name: string;
+  provider: string;
+}
+
 export class GatewayClientError extends Error {
   constructor(
     public readonly status: number,
@@ -217,6 +234,37 @@ export class GatewayClient {
     }
   }
 
+  /** GET /api/agents — returns available agents (graceful 404 fallback) */
+  async listAgents(): Promise<AgentInfo[]> {
+    try {
+      const res = await this.request<{ data: AgentInfo[] }>("GET", "/api/agents");
+      return res.data ?? [];
+    } catch (err) {
+      // Endpoint not implemented yet — return default list
+      if (err instanceof GatewayClientError && err.status === 404) {
+        return [
+          { id: "default", name: "Default Agent", description: "Main Hermes agent" },
+        ];
+      }
+      throw err;
+    }
+  }
+
+  /** GET /api/models — returns available models (graceful 404 fallback) */
+  async listModels(): Promise<ModelInfo[]> {
+    try {
+      const res = await this.request<{ data: ModelInfo[] }>("GET", "/api/models");
+      return res.data ?? [];
+    } catch (err) {
+      if (err instanceof GatewayClientError && err.status === 404) {
+        return [
+          { id: "default", name: "Default Model", provider: "default" },
+        ];
+      }
+      throw err;
+    }
+  }
+
   /**
    * POST /api/sessions/{id}/chat/stream — Server-Sent Events
    *
@@ -227,16 +275,35 @@ export class GatewayClient {
     sessionId: string,
     message: string,
     onEvent: OnGatewayEvent,
+    options?: {
+      agent?: string;
+      model?: string;
+      images?: string[];
+    },
   ): Promise<void> {
     const url = `${this.baseUrl}/api/sessions/${encodeURIComponent(sessionId)}/chat/stream`;
 
     this.abortController = new AbortController();
 
+    // Build request body — include images as base64 data URLs if provided
+    const body: Record<string, unknown> = {
+      message,
+      ...(options?.agent && { agent: options.agent }),
+      ...(options?.model && { model: options.model }),
+    };
+    if (options?.images && options.images.length > 0) {
+      body.images = options.images.map((dataUrl) => ({
+        type: "image",
+        data: dataUrl,
+        mime_type: "image/png",
+      }));
+    }
+
     try {
       const res = await fetch(url, {
         method: "POST",
         headers: this.headers({ Accept: "text/event-stream" }),
-        body: JSON.stringify({ message }),
+        body: JSON.stringify(body),
         signal: this.abortController.signal,
       });
 

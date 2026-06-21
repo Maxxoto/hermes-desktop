@@ -171,7 +171,7 @@ describe("StatusBar", () => {
       reconnectIn: null,
     };
     renderWithProviders(<StatusBar />);
-    expect(screen.getByText("v?")).toBeInTheDocument();
+    expect(screen.getByText("vdev")).toBeInTheDocument();
   });
 
   it("hides session count when no data", () => {

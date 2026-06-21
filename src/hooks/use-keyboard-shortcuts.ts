@@ -4,14 +4,20 @@ import { useEffect } from "react";
  * Keyboard shortcuts for Hermes Desktop.
  *
  * - Cmd/Ctrl + N: Create new session
- * - Cmd/Ctrl + K: Focus search input (dispatches a window event that SessionList listens for)
  * - Cmd/Ctrl + Backspace: Delete the active session
+ * - Cmd/Ctrl + B: Toggle sidebar
+ * - Cmd/Ctrl + \: Toggle split view
+ *
+ * Note: Cmd/Ctrl + K is handled by the Command Palette
+ * (useCommandPaletteShortcut in CommandPalette.tsx).
  *
  * @param handlers Callbacks for each shortcut
  */
 export function useKeyboardShortcuts(handlers: {
   onNewSession: () => void;
   onDeleteSession: () => void;
+  onToggleSidebar?: () => void;
+  onToggleSplitView?: () => void;
 }) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -25,16 +31,24 @@ export function useKeyboardShortcuts(handlers: {
           handlers.onNewSession();
           break;
         }
-        case "k":
-        case "K": {
-          e.preventDefault();
-          // Dispatch a custom event — SessionList listens and focuses its search input
-          window.dispatchEvent(new CustomEvent("hermes:focus-search"));
-          break;
-        }
         case "Backspace": {
           e.preventDefault();
           handlers.onDeleteSession();
+          break;
+        }
+        case "b":
+        case "B": {
+          if (handlers.onToggleSidebar) {
+            e.preventDefault();
+            handlers.onToggleSidebar();
+          }
+          break;
+        }
+        case "\\": {
+          if (handlers.onToggleSplitView) {
+            e.preventDefault();
+            handlers.onToggleSplitView();
+          }
           break;
         }
       }

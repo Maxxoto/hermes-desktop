@@ -28,6 +28,8 @@ const mockCreateSession = vi.fn();
 const mockChatStream = vi.fn();
 const mockGetSessionMessages = vi.fn();
 const mockStopGeneration = vi.fn();
+const mockListAgents = vi.fn();
+const mockListModels = vi.fn();
 
 vi.mock("../features/connection/gateway-api", () => ({
   getGatewayClient: () => ({
@@ -35,6 +37,8 @@ vi.mock("../features/connection/gateway-api", () => ({
     chatStream: (...a: unknown[]) => mockChatStream(...a),
     getSessionMessages: (...a: unknown[]) => mockGetSessionMessages(...a),
     stopGeneration: () => mockStopGeneration(),
+    listAgents: (...a: unknown[]) => mockListAgents(...a),
+    listModels: (...a: unknown[]) => mockListModels(...a),
   }),
 }));
 
@@ -44,6 +48,7 @@ const mockAutoTitleMutate = vi.fn();
 const mockDeleteMutate = vi.fn();
 
 vi.mock("../features/sessions/use-sessions", () => ({
+  useSessions: () => ({ data: [] }),
   useAutoTitle: () => ({ mutate: mockAutoTitleMutate, isPending: false }),
   useDeleteSession: () => ({ mutate: mockDeleteMutate, isPending: false }),
 }));
@@ -143,6 +148,12 @@ describe("ChatPage", () => {
     mockCreateSession.mockResolvedValue({ id: "new_sess_123" });
     mockGetSessionMessages.mockResolvedValue([]);
     mockChatStream.mockImplementation(makeStreamEvents());
+    mockListAgents.mockResolvedValue([
+      { id: "default", name: "Default Agent", description: "Main Hermes agent" },
+    ]);
+    mockListModels.mockResolvedValue([
+      { id: "default", name: "Default Model", provider: "default" },
+    ]);
   });
 
   afterEach(() => {
@@ -232,6 +243,7 @@ describe("ChatPage", () => {
         expect.any(String),
         "Hello agent",
         expect.any(Function),
+        expect.any(Object),
       );
     });
   });
@@ -432,12 +444,12 @@ describe("ChatPage", () => {
     render(<ChatPage />, { wrapper: createWrapper() });
 
     await user.type(screen.getByPlaceholderText("Type a message…"), "Follow up{Enter}");
-
     await waitFor(() => {
       expect(mockChatStream).toHaveBeenCalledWith(
         "existing_sess",
         "Follow up",
         expect.any(Function),
+        expect.any(Object),
       );
     });
     expect(mockCreateSession).not.toHaveBeenCalled();
