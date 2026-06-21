@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { MessageSquare, GitFork, Menu, X, Square, LogOut, Sun, Moon, PanelLeftClose, PanelLeftOpen, Columns2 } from "lucide-react";
+import { MessageSquare, GitFork, Menu, X, Square, LogOut, Sun, Moon, PanelLeftClose, PanelLeftOpen, Columns2, Settings } from "lucide-react";
 import { useChatStore, type Message } from "./use-chat-store";
 import { ChatInput } from "./ChatInput";
 import { MessageBubble } from "./MessageBubble";
@@ -558,6 +558,14 @@ export default function ChatPage() {
             className="mac-icon-btn"
           >
             <Columns2 className="h-4 w-4" />
+          </button>
+          <button
+            onClick={handlePaletteGoSettings}
+            title="Settings"
+            aria-label="Settings"
+            className="mac-icon-btn"
+          >
+            <Settings className="h-4 w-4" />
           </button>
           <button
             onClick={toggleTheme}
