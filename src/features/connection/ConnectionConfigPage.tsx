@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { invoke } from "@tauri-apps/api/core";
 import { useConnectionStore } from "./connection-store";
 import { useTestConnection } from "./use-gateway-connection";
@@ -7,10 +7,12 @@ import { useWindowTitle } from "../../hooks/use-window-title";
 
 export default function ConnectionConfigPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isEditMode = searchParams.get("edit") === "1";
   const { gatewayUrl, apiKey, isConfigured, setCredentials } =
     useConnectionStore();
 
-  useWindowTitle("Settings");
+  useWindowTitle(isEditMode ? "Settings" : "Connect");
 
   const [url, setUrl] = useState(gatewayUrl);
   const [key, setKey] = useState(apiKey);
@@ -18,10 +20,11 @@ export default function ConnectionConfigPage() {
   const testMutation = useTestConnection();
 
   useEffect(() => {
-    if (isConfigured && gatewayUrl && apiKey) {
+    // Only auto-redirect on initial setup — not when user opened Settings voluntarily
+    if (!isEditMode && isConfigured && gatewayUrl && apiKey) {
       navigate("/chat", { replace: true });
     }
-  }, [isConfigured, gatewayUrl, apiKey, navigate]);
+  }, [isEditMode, isConfigured, gatewayUrl, apiKey, navigate]);
 
   useEffect(() => {
     setUrl(gatewayUrl);
@@ -73,9 +76,20 @@ export default function ConnectionConfigPage() {
             Hermes Desktop
           </h1>
           <p className="mt-2 text-[13px] dark:text-mac-secondary-label light:text-gray-600">
-            Connect to your Hermes Gateway
+            {isEditMode ? "Gateway Settings" : "Connect to your Hermes Gateway"}
           </p>
         </div>
+
+        {/* Back to Chat (edit mode only) */}
+        {isEditMode && (
+          <button
+            type="button"
+            onClick={() => navigate("/chat")}
+            className="mac-btn w-full mb-5 flex items-center justify-center gap-2"
+          >
+            ← Back to Chat
+          </button>
+        )}
 
         {/* Form */}
         <div className="space-y-5">

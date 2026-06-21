@@ -136,7 +136,7 @@ export default function ChatPage() {
   }, [sessionId]);
 
   const handlePaletteGoSettings = useCallback(() => {
-    navigate("/connection");
+    navigate("/connection?edit=1");
   }, [navigate]);
 
   const handlePaletteGoCurrent = useCallback(() => {

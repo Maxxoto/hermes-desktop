@@ -178,7 +178,7 @@ export function CommandPalette({
           shouldFilter={false}
           loop
           label="Command Palette"
-          className="flex flex-col relative"
+          className="flex flex-col relative min-h-0 overflow-hidden flex-1"
         >
           {/* Search input */}
           <div className="flex items-center gap-3 px-4 py-3 glass-border-b">

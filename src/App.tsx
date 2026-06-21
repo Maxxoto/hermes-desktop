@@ -21,7 +21,7 @@ export default function App() {
       navigate(`/chat?session=${encodeURIComponent(sessionId)}`);
     },
     onSettings: () => {
-      navigate("/connection");
+      navigate("/connection?edit=1");
     },
   });
 
