@@ -428,6 +428,7 @@ export default function CompactChat({
         height: "300px",
         maxWidth: "90vw",
         maxHeight: "80vh",
+        minHeight: "200px",
         animation: "cmdk-scale 180ms cubic-bezier(0.16, 1, 0.3, 1)",
       }}
       data-testid="compact-chat"
@@ -451,7 +452,7 @@ export default function CompactChat({
             title={isMuted ? "Unmute TTS" : "Mute TTS"}
             aria-label={isMuted ? "Unmute TTS" : "Mute TTS"}
             className={cn(
-              "flex items-center justify-center w-7 h-7 rounded-full",
+              "flex items-center justify-center w-8 h-8 rounded-full",
               "mac-icon-btn",
               "transition-all duration-150",
               isMuted
@@ -476,7 +477,7 @@ export default function CompactChat({
               "text-[12px] font-medium",
               "transition-all duration-150",
               "mac-btn",
-              "!h-7 !px-2",
+              "!h-8 !px-2",
             )}
           >
             {modeLabels[mode].icon}
@@ -499,10 +500,10 @@ export default function CompactChat({
               screenShare.isSharing ? "Stop screen sharing" : "Share screen"
             }
             className={cn(
-              "flex items-center justify-center w-7 h-7 rounded-full",
+              "flex items-center justify-center w-8 h-8 rounded-full",
               "mac-icon-btn transition-all duration-150",
               screenShare.isSharing
-                ? "text-[#FF453A]"
+                ? "dark:text-mac-red light:text-red-500"
                 : "dark:text-mac-secondary-label light:text-gray-400",
             )}
           >
@@ -519,9 +520,9 @@ export default function CompactChat({
               onClick={onOpenSettings}
               title="Settings"
               aria-label="Open settings"
-              className="mac-icon-btn !w-7 !h-7"
+              className="mac-icon-btn !w-8 !h-8"
             >
-              <Settings className="h-3 w-3" />
+              <Settings className="h-3.5 w-3.5" />
             </button>
           )}
 
@@ -530,9 +531,9 @@ export default function CompactChat({
             onClick={handleClose}
             title="Close overlay"
             aria-label="Close overlay"
-            className="mac-icon-btn !w-7 !h-7"
+            className="mac-icon-btn !w-8 !h-8"
           >
-            <X className="h-3.5 w-3.5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
       </div>
@@ -671,7 +672,7 @@ export default function CompactChat({
           aria-label="Send message"
           className={cn(
             "flex-shrink-0 flex items-center justify-center",
-            "w-7 h-7 rounded-full",
+            "w-8 h-8 rounded-full",
             "mac-btn-primary",
             "transition-all duration-150",
             "active:scale-[0.92]",

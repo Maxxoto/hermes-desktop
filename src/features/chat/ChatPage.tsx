@@ -473,9 +473,9 @@ export default function ChatPage() {
               <MessageSquare className="h-14 w-14 sm:h-16 sm:w-16 mb-3 opacity-30 relative z-10" />
             </div>
             <p className="text-[14px] font-semibold mt-2">Start a conversation</p>
-            <p className="text-[11px] mt-1 opacity-60">Type a message below to begin chatting with Hermes</p>
-            <p className="text-[10px] mt-4 opacity-30">
-              Press <kbd className="px-1 py-0.5 rounded text-[9px]" style={{ background: "rgba(255,255,255,0.08)" }}>⌘K</kbd> for commands
+            <p className="text-[12px] mt-1 opacity-60">Type a message below to begin chatting with Hermes</p>
+            <p className="text-[12px] mt-4 opacity-50">
+              Press <kbd className="px-1.5 py-0.5 rounded text-[11px] font-mono" style={{ background: "rgba(255,255,255,0.08)" }}>⌘K</kbd> for commands
             </p>
           </div>
         )}
@@ -639,7 +639,7 @@ export default function ChatPage() {
   return (
     <div
       className="flex flex-1 min-h-0 dark:text-mac-label light:text-black overflow-hidden"
-      style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #16162a 50%, #0f0f23 100%)" }}
+      style={{ background: "var(--mac-window)" }}
     >
       {/* Sidebar — glass panel with desktop collapse */}
       <aside

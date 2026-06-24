@@ -96,7 +96,7 @@
 /* ---- Global defaults ----------------------------------------------------- */
 html {
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 14px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -104,16 +104,28 @@ html {
 
 body {
   margin: 0;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16162a 50%, #0f0f23 100%);
+  background: var(--mac-window);
   color: var(--mac-label);
-  font-size: 13px;
-  line-height: 16px;
+  font-size: 14px;
+  line-height: 1.5;
   min-height: 100vh;
 }
 
 /* ---- Cursor rules ------------------------------------------------------- */
-* { cursor: default; }
-a, [role="link"] { cursor: pointer; }
+/* Remove global cursor:default — use inherit + explicit pointer on interactive */
+button,
+[role="button"],
+[role="tab"],
+[role="link"],
+a,
+summary,
+select,
+label[for],
+.mac-btn,
+.mac-icon-btn,
+.send-btn-glass,
+[onclick] { cursor: pointer; }
+
 input[type="text"], input[type="search"], input[type="url"], input[type="password"],
 input[type="email"], textarea, [contenteditable] { cursor: text; }
 
@@ -137,16 +149,33 @@ input[type="email"], textarea, [contenteditable] { cursor: text; }
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.35);
 }
+:root.light ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+}
+:root.light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.35);
+}
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
+:root.light * {
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
 
 /* ---- Focus rules --------------------------------------------------------- */
 :focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(10, 132, 255, 0.5);
-  border-radius: 6px;
+  outline: 2px solid var(--mac-accent);
+  outline-offset: 2px;
+}
+button:focus-visible,
+[role="tab"]:focus-visible,
+.mac-btn:focus-visible,
+.mac-icon-btn:focus-visible {
+  outline: 2px solid var(--mac-accent);
+  outline-offset: 2px;
+  border-radius: 8px;
+  box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.2);
 }
 
 /* ---- Keyboard navigation focus ring -------------------------------------- */
@@ -336,7 +365,7 @@ input[type="email"], textarea, [contenteditable] { cursor: text; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 28px;
+  height: 32px;
   padding: 0 16px;
   font-size: 13px;
   font-weight: 500;
@@ -344,7 +373,7 @@ input[type="email"], textarea, [contenteditable] { cursor: text; }
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: var(--mac-label);
-  cursor: default;
+  cursor: pointer;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   box-shadow:
@@ -371,7 +400,7 @@ input[type="email"], textarea, [contenteditable] { cursor: text; }
 
 /* Primary button — glass blue */
 .mac-btn-primary {
-  cursor: default;
+  cursor: pointer;
   background: linear-gradient(180deg, rgba(10, 132, 255, 0.85) 0%, rgba(0, 100, 210, 0.9) 100%);
   border-color: rgba(0, 0, 0, 0.25);
   color: #ffffff;
@@ -454,13 +483,15 @@ input[type="email"], textarea, [contenteditable] { cursor: text; }
 .mac-icon-btn {
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
   border-radius: 8px;
   background: transparent;
   border: none;
   color: var(--mac-secondary-label);
-  cursor: default;
+  cursor: pointer;
   transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .mac-icon-btn:hover {
@@ -550,7 +581,7 @@ input[type="email"], textarea, [contenteditable] { cursor: text; }
 /* ---- Send Button Glass ---------------------------------------------- */
 .send-btn-glass {
   transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1);
-  cursor: default;
+  cursor: pointer;
   background: linear-gradient(135deg, rgba(10, 132, 255, 0.85) 0%, rgba(0, 100, 210, 0.9) 100%);
   border: 1px solid rgba(0, 0, 0, 0.25);
   box-shadow:

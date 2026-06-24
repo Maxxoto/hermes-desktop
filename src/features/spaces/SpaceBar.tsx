@@ -1,7 +1,21 @@
 import { useState, useRef, useEffect } from 'react';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Home, Code, ClipboardList, Moon, Sparkles, type LucideIcon } from 'lucide-react';
 import { useSpaces } from './use-spaces';
 import SpaceSettings from './SpaceSettings';
+
+/** Map emoji icons to Lucide SVG components for crisp rendering and theming */
+const ICON_MAP: Record<string, LucideIcon> = {
+  '🏠': Home,
+  '💻': Code,
+  '📋': ClipboardList,
+  '🌙': Moon,
+  '✨': Sparkles,
+};
+
+function SpaceIcon({ icon, className }: { icon: string; className?: string }) {
+  const Component = ICON_MAP[icon] ?? Sparkles;
+  return <Component className={className} />;
+}
 
 /**
  * SpaceBar — compact horizontal space switcher at the top of the sidebar.
@@ -69,7 +83,7 @@ export default function SpaceBar() {
                   e.preventDefault();
                   setSettingsSpaceId(space.id);
                 }}
-                className="shrink-0 flex items-center gap-1 h-7 px-2.5 rounded-full
+                className="shrink-0 flex items-center gap-1.5 h-9 px-3 rounded-lg
                   text-[12px] font-medium transition-all duration-150
                   whitespace-nowrap select-none"
                 style={
@@ -78,6 +92,7 @@ export default function SpaceBar() {
                         background: `${space.color}20`,
                         border: `1px solid ${space.color}60`,
                         color: space.color,
+                        fontWeight: 600,
                       }
                     : {
                         background: 'transparent',
@@ -87,8 +102,8 @@ export default function SpaceBar() {
                 }
                 title={space.name}
               >
-                <span className="text-[13px] leading-none">{space.icon}</span>
-                <span className="dark:text-mac-secondary-label light:text-gray-600">
+                <SpaceIcon icon={space.icon} className="w-3.5 h-3.5 shrink-0" />
+                <span className={isActive ? '' : 'dark:text-mac-secondary-label light:text-gray-600'}>
                   {space.name}
                 </span>
               </button>
@@ -126,7 +141,7 @@ export default function SpaceBar() {
           ) : (
             <button
               onClick={() => setShowCreate(true)}
-              className="shrink-0 flex items-center justify-center h-7 w-7 rounded-full
+              className="shrink-0 flex items-center justify-center h-9 w-9 rounded-lg
                 border border-dashed dark:border-white/20 light:border-black/15
                 dark:text-mac-tertiary-label light:text-gray-400
                 hover:dark:bg-white/5 hover:light:bg-black/5
@@ -134,7 +149,7 @@ export default function SpaceBar() {
               title="Add space"
               aria-label="Add space"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-4 h-4" />
             </button>
           )}
         </div>

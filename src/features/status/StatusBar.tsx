@@ -21,8 +21,8 @@ export default function StatusBar() {
   }, []);
 
   return (
-    <footer role="status" className="flex items-center justify-between vibrancy-statusbar px-5 text-[11px] dark:text-mac-secondary-label light:text-gray-500"
-      style={{ height: "26px" }}>
+    <footer role="status" className="flex items-center justify-between vibrancy-statusbar px-5 text-[12px] dark:text-mac-secondary-label light:text-gray-500"
+      style={{ height: "32px" }}>
       {/* Left — Connection indicator */}
       <div className="flex items-center gap-2">
         {isLoading ? (
@@ -54,7 +54,11 @@ export default function StatusBar() {
         <button
           onClick={toggleOverlay}
           title="Toggle Overlay (⌘⇧Space)"
-          className="flex items-center gap-1 dark:text-mac-tertiary-label light:text-gray-400 hover:dark:text-mac-label hover:light:text-black transition-colors"
+          className="flex items-center gap-1 px-2 h-6 rounded-md
+            dark:text-mac-tertiary-label light:text-gray-400
+            hover:dark:text-mac-label hover:light:text-black
+            hover:dark:bg-white/5 hover:light:bg-black/5
+            transition-colors"
         >
           <Sparkles className="h-3 w-3" />
           Overlay

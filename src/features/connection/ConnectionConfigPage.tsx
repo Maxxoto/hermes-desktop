@@ -61,7 +61,7 @@ export default function ConnectionConfigPage() {
 
   return (
     <div className="flex min-h-dvh items-center justify-center px-4"
-      style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16162a 50%, #0f0f23 100%)' }}>
+      style={{ background: 'var(--mac-window)' }}>
       <div className="w-full max-w-md glass-surface rounded-2xl p-10">
         {/* Header */}
         <div className="mb-8 text-center">
@@ -97,7 +97,7 @@ export default function ConnectionConfigPage() {
           <div>
             <label
               htmlFor="gateway-url"
-              className="mb-2 block text-[12px] font-medium dark:text-mac-secondary-label light:text-gray-600 uppercase tracking-wide"
+              className="mb-2 block text-[12px] font-medium dark:text-mac-secondary-label light:text-gray-600"
             >
               Gateway URL
             </label>
@@ -107,7 +107,7 @@ export default function ConnectionConfigPage() {
               placeholder="https://gateway.example.com"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              className="w-full glass-input px-4 py-2.5 text-[13px]
+              className="w-full glass-input px-4 py-2.5 text-[14px]
                 dark:text-mac-label dark:placeholder:text-mac-tertiary-label
                 light:text-black light:placeholder:text-gray-400"
             />
@@ -117,7 +117,7 @@ export default function ConnectionConfigPage() {
           <div>
             <label
               htmlFor="api-key"
-              className="mb-2 block text-[12px] font-medium dark:text-mac-secondary-label light:text-gray-600 uppercase tracking-wide"
+              className="mb-2 block text-[12px] font-medium dark:text-mac-secondary-label light:text-gray-600"
             >
               API Key
             </label>
@@ -127,7 +127,7 @@ export default function ConnectionConfigPage() {
               placeholder="sk-..."
               value={key}
               onChange={(e) => setKey(e.target.value)}
-              className="w-full glass-input px-4 py-2.5 text-[13px]
+              className="w-full glass-input px-4 py-2.5 text-[14px]
                 dark:text-mac-label dark:placeholder:text-mac-tertiary-label
                 light:text-black light:placeholder:text-gray-400"
             />
